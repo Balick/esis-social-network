@@ -48,6 +48,29 @@ Types courants : `feat`, `fix`, `docs`, `style`, `refactor`, `perf`, `chore`, `c
   `<fieldset>`…) avant tout attribut ARIA.
 - Noms de classes, d'identifiants et de variables en **anglais** ; commentaires, documentation et
   interface en **français**.
+- **Composants partagés d'abord** : avant de créer un style, regardez la page
+  [`composants.html`](composants.html), qui présente tout le kit (boutons, cartes, champs, onglets,
+  menus, dialogues…).
+
+### Blocs partagés (`partials/`)
+
+Le `<head>`, le menu latéral, le lien d'évitement, le toast et le sprite d'icônes sont identiques
+sur toutes les pages. Ils sont écrits **une seule fois** dans `partials/` puis recopiés dans chaque
+page, entre deux marqueurs :
+
+```html
+<!-- partial:sidebar -->
+…contenu généré, ne pas modifier ici…
+<!-- /partial:sidebar -->
+```
+
+- Modifiez le fichier de `partials/` (ou une icône de `assets/icons/`), puis lancez
+  **`npm run sync`** : toutes les pages sont mises à jour. Commitez le résultat.
+- Le lien actif du menu est déduit de `<body data-page="…">` (valeurs : `fil`, `profil`,
+  `messages`, `forums`, `amis`, `agenda`, `parametres`) : le script y ajoute `aria-current="page"`.
+- La CI vérifie que les pages sont à jour (`npm run lint:sync`).
+- Pourquoi pas un `fetch` ou des Web Components ? Pour que le site fonctionne en ouvrant les
+  fichiers directement depuis le disque (`file://`), sans serveur.
 
 ### CSS
 
@@ -89,10 +112,30 @@ Types courants : `feat`, `fix`, `docs`, `style`, `refactor`, `perf`, `chore`, `c
 
 - **Amélioration progressive uniquement** : la page doit rester utilisable sans JavaScript (les
   filtres, le sondage et les popovers fonctionnent en HTML/CSS).
-- **Script classique** chargé avec `<script src="assets/js/app.js" defer>`, **pas de module ES** :
-  le site doit fonctionner en ouvrant `index.html` directement (`file://`), où les modules sont
-  bloqués.
-- JavaScript natif, sans dépendance.
+- **Script classique** chargé avec `defer`, **pas de module ES** : le site doit fonctionner en
+  ouvrant les pages directement (`file://`), où les modules sont bloqués.
+- `assets/js/app.js` est commun à toutes les pages ; chaque page peut ajouter **son** script
+  (`assets/js/forums.js`…), chargé après lui dans son `<head>`.
+- JavaScript natif, sans dépendance. Jamais d'`innerHTML` avec un texte saisi : `textContent`.
+
+`app.js` expose une petite API, `window.postit`, pour les scripts de page :
+
+```js
+;(() => {
+  'use strict'
+  const { notify, register, closePopover, prefersReducedMotion, ME } = window.postit
+
+  // <button type="button" data-action="archive">Archiver</button>
+  register('archive', (button, event) => {
+    closePopover(button) // ferme le menu qui contient le bouton, s'il y en a un
+    notify('Conversation archivée') // toast, aussi lu par les lecteurs d'écran
+  })
+})()
+```
+
+Actions déjà disponibles partout via `data-action` : `like`, `react`, `follow` (avec `data-name`),
+`save`, `report`, `copy-link`, `notify` (avec `data-message`), `comment`, `reply`. Un lien de
+démonstration `href="#quelque-chose"` sans cible affiche un toast « bientôt disponible ».
 
 ## Recettes
 
@@ -116,12 +159,12 @@ Types courants : `feat`, `fix`, `docs`, `style`, `refactor`, `perf`, `chore`, `c
 
 1. Choisissez l'icône sur [Phosphor Icons](https://phosphoricons.com) (licence MIT), dans la même
    graisse que ses voisines (`fill`, `bold` ou `regular`).
-2. Enregistrez le SVG source dans `assets/icons/`.
-3. Ajoutez un `<symbol id="icon-nom" viewBox="0 0 256 256">` (tracés en `fill="currentColor"`)
-   **dans `assets/icons/sprite.svg` et dans le sprite intégré en haut de `index.html`**. C'est la
-   copie intégrée que la page utilise : une référence externe (`sprite.svg#icon-nom`) ne fonctionne
-   pas en `file://`.
-4. Utilisez-la ainsi :
+2. Enregistrez le SVG dans `assets/icons/nom.svg`, au même format que ses voisins
+   (`viewBox="0 0 256 256"`, `fill="currentColor"`).
+3. Lancez `npm run sync` : l'icône est ajoutée au sprite intégré dans chaque page (une référence
+   externe, `sprite.svg#icon-nom`, ne fonctionnerait pas en `file://`).
+4. Utilisez-la ainsi (la page [`composants.html`](composants.html) liste toutes les icônes et
+   copie ce code au clic) :
 
 ```html
 <svg class="icon" aria-hidden="true"><use href="#icon-nom"></use></svg>
@@ -142,19 +185,34 @@ Une icône seule dans un bouton ou un lien est décorative : donnez au bouton un
 
 ### Ajouter un composant
 
-1. Créez `assets/css/components/mon-composant.css`.
-2. Placez toutes ses règles dans `@layer components { … }`.
-3. Liez-le dans le `<head>` de `index.html`, après les autres composants :
-   `<link rel="stylesheet" href="assets/css/components/mon-composant.css">`.
-4. Utilisez uniquement les tokens et vérifiez le rendu en clair comme en sombre.
+1. Créez `assets/css/components/mon-composant.css` et placez toutes ses règles dans
+   `@layer components { … }`. Vérifiez que le nom du bloc n'est pas déjà pris.
+2. Composant **propre à une page** : liez-le dans le `<head>` de cette page, après le bloc
+   `partial:head`. Composant **partagé** : ajoutez le lien dans `partials/head.html`, lancez
+   `npm run sync`, et présentez-le dans `composants.html`.
+3. Utilisez uniquement les tokens et vérifiez le rendu en clair comme en sombre.
+
+### Ajouter une page
+
+1. Copiez une page proche (par exemple `amis.html`) et changez `<title>`, la description et
+   `<body data-page="…">`.
+2. Gardez les marqueurs `<!-- partial:… -->` tels quels (même vides) et lancez `npm run sync`.
+3. Gardez un seul `<h1>` (dans `<header class="page-header">`) et un `<main id="main" tabindex="-1">`,
+   cible du lien d'évitement.
+4. Sans colonne de droite (`<aside class="aside">`), la mise en page passe toute seule à deux
+   colonnes.
+5. Pour l'ajouter au menu, modifiez `partials/sidebar.html` (avec un `data-nav` unique), puis
+   `npm run sync`.
 
 ## Lint
 
 ```bash
 npm install            # une seule fois
 npm run lint           # tout vérifier, comme la CI
+npm run sync           # met à jour les blocs partagés dans toutes les pages
+npm run lint:sync      # vérifie que les pages sont à jour
 npm run lint:css       # stylelint (assets/css)
-npm run lint:html      # html-validate (index.html)
+npm run lint:html      # html-validate (toutes les pages)
 npm run lint:format    # Prettier en mode vérification
 npm run format         # reformate CSS, JS, JSON, Markdown et YAML
 npx stylelint "assets/css/**/*.css" --fix   # corrige automatiquement ce qui peut l'être
@@ -168,6 +226,12 @@ Quelques règles qui surprennent souvent :
 - **HTML** : chaque `<button>` a un `type`, les balises vides ne se ferment pas (`<img …>` et non
   `<img … />`), chaque contrôle a un `<label>`, un bouton icône a un `aria-label`, les titres ne
   sautent pas de niveau et `&` s'écrit `&amp;`.
+- **Attribut `pattern`** : les navigateurs le lisent avec le drapeau `v` des expressions
+  régulières, plus strict. Dans une classe de caractères, échappez `-`, `(`, `)`… ou préférez une
+  classe simple (`\+?[0-9 ]{6,20}`), sinon la console affiche une erreur et le champ n'est pas
+  validé.
+- Un `<dialog>` est souvent hors de `<main>` : utilisez `<div class="dialog__header">` et non
+  `<header>`, qui créerait un deuxième repère « bannière ».
 - Le HTML n'est pas reformaté par Prettier : indentez-le à la main (2 espaces).
 
 ## Checklist avant la pull request
@@ -176,5 +240,6 @@ Quelques règles qui surprennent souvent :
 - [ ] Testé en thème **clair** et en thème **sombre**
 - [ ] Tout est utilisable **au clavier**, avec un focus visible
 - [ ] **Aucune erreur** dans la console du navigateur
+- [ ] Le **mode sans JavaScript** reste utilisable (désactivez-le dans les outils de développement)
 - [ ] **`npm run lint` passe**
 - [ ] Les nouvelles images sont créditées dans `CREDITS.md`
