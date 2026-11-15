@@ -1,0 +1,101 @@
+/*
+ * Recommandations : quatre tuiles aux formes différentes, dessinées en CSS pur.
+ *   UI/UX      cercle festonné (masque SVG en data URI)
+ *   Musique    disque vinyle (dégradés radiaux répétés)
+ *   Cuisine    photo ronde assombrie
+ *   Randonnée  carré arrondi
+ * La forme est portée par ::before : le lien lui-même n'est pas masqué,
+ * donc son anneau de focus reste entièrement visible.
+ */
+
+@layer components {
+  .topics__list {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--space-3);
+    max-inline-size: 20rem;
+  }
+
+  .topic {
+    --topic-radius: 50%;
+
+    position: relative;
+    display: grid;
+    place-content: center;
+    justify-items: center;
+    gap: var(--space-1);
+    aspect-ratio: 1;
+    font-size: var(--text-sm);
+    font-weight: var(--weight-semibold);
+    color: var(--color-text);
+    text-decoration: none;
+    isolation: isolate;
+    border-radius: var(--topic-radius);
+    transition: scale var(--duration) var(--ease-spring);
+
+    &::before {
+      position: absolute;
+      inset: 0;
+      z-index: -1;
+      content: '';
+      background: var(--topic-background, var(--tone-sky));
+      border-radius: var(--topic-radius);
+      transition: rotate 800ms var(--ease-out);
+    }
+
+    &:hover {
+      scale: 1.05;
+    }
+  }
+
+  .topic--design {
+    --topic-background: var(--tone-azure);
+
+    &::before {
+      border-radius: 0;
+      mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpath d='M50 8A12.2 12.2 0 0 1 71 13.63A12.2 12.2 0 0 1 86.37 29A12.2 12.2 0 0 1 92 50A12.2 12.2 0 0 1 86.37 71A12.2 12.2 0 0 1 71 86.37A12.2 12.2 0 0 1 50 92A12.2 12.2 0 0 1 29 86.37A12.2 12.2 0 0 1 13.63 71A12.2 12.2 0 0 1 8 50A12.2 12.2 0 0 1 13.63 29A12.2 12.2 0 0 1 29 13.63A12.2 12.2 0 0 1 50 8Z'/%3E%3C/svg%3E")
+        center / contain no-repeat;
+    }
+
+    &:hover::before {
+      rotate: 30deg;
+    }
+  }
+
+  .topic--music {
+    --topic-background:
+      radial-gradient(
+        circle,
+        transparent 0 22%,
+        oklch(0% 0 0deg / 8%) 22.5% 23.5%,
+        transparent 24%
+      ),
+      repeating-radial-gradient(circle, transparent 0 0.3rem, oklch(0% 0 0deg / 6%) 0.3rem 0.35rem),
+      var(--tone-rose);
+  }
+
+  .topic--cooking {
+    color: oklch(100% 0 0deg);
+    text-shadow: 0 1px 0.5rem oklch(0% 0 0deg / 50%);
+
+    &::before {
+      display: none;
+    }
+  }
+
+  .topic__image {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    inline-size: 100%;
+    block-size: 100%;
+    object-fit: cover;
+    filter: brightness(0.62) saturate(1.1);
+    border-radius: 50%;
+  }
+
+  .topic--hiking {
+    --topic-radius: var(--radius-lg);
+    --topic-background: var(--tone-violet);
+  }
+}

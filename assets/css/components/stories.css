@@ -1,0 +1,90 @@
+/*
+ * Titres de section de la colonne « Découvrir » + carrousel de stories.
+ * Le carrousel est un simple défilement horizontal avec scroll-snap :
+ * souris, tactile, trackpad et clavier (Tab) fonctionnent sans JavaScript.
+ */
+
+@layer components {
+  .section-title {
+    margin-block-end: var(--space-4);
+    font-size: var(--text-xl);
+    font-weight: var(--weight-bold);
+  }
+
+  .stories__list {
+    display: grid;
+    grid-auto-columns: calc((100% - var(--space-3)) / 2.2);
+    grid-auto-flow: column;
+    gap: var(--space-3);
+
+    /* Un peu d'air pour que l'anneau de focus ne soit pas rogné par le défilement */
+    padding: 3px;
+    margin: -3px;
+    overflow-x: auto;
+    overscroll-behavior-inline: contain;
+    scroll-snap-type: inline mandatory;
+    scroll-padding-inline: 3px;
+    scrollbar-width: none;
+  }
+
+  .story {
+    scroll-snap-align: start;
+  }
+
+  .story__link {
+    position: relative;
+    display: block;
+    aspect-ratio: 2 / 3;
+    overflow: hidden;
+    text-decoration: none;
+    isolation: isolate;
+    border-radius: var(--radius-md);
+
+    /* Voile en bas de l'image pour détacher l'étiquette */
+    &::after {
+      position: absolute;
+      inset: 0;
+      content: '';
+      background: linear-gradient(transparent 55%, oklch(0% 0 0deg / 35%));
+    }
+
+    &:focus-visible {
+      outline-offset: 2px;
+    }
+  }
+
+  .story__image {
+    position: absolute;
+    inset: 0;
+    inline-size: 100%;
+    block-size: 100%;
+    object-fit: cover;
+    transition: scale 600ms var(--ease-out);
+
+    .story__link:hover & {
+      scale: 1.06;
+    }
+  }
+
+  .story__author {
+    position: absolute;
+    inset-block-end: var(--space-1);
+    inset-inline: var(--space-1);
+    z-index: 1;
+    display: flex;
+    gap: var(--space-1);
+    align-items: center;
+    padding: 0.1875rem var(--space-2) 0.1875rem 0.1875rem;
+    font-size: var(--text-2xs);
+    font-weight: var(--weight-medium);
+    background-color: var(--color-surface);
+    border-radius: var(--radius-full);
+    box-shadow: var(--shadow-sm);
+  }
+
+  .story__name {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+}

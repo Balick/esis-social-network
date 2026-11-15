@@ -1,542 +1,736 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="fr">
-<head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Média social</title>
-    <link rel="stylesheet" href="./styles.css">
-    <script src="./index.js" defer></script>
-</head>
-<body>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Post it — le réseau social des étudiants de l'ESIS</title>
+    <meta
+      name="description"
+      content="Post it, le réseau social des étudiants de l'ESIS : fil d'actualité, stories, forums et vie du campus. Une interface en HTML et CSS modernes, sans framework."
+    >
+    <meta name="color-scheme" content="light dark">
+    <meta name="theme-color" content="#d4d2de" media="(prefers-color-scheme: light)">
+    <meta name="theme-color" content="#0c0c11" media="(prefers-color-scheme: dark)">
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="Post it — le réseau social des étudiants de l'ESIS">
+    <meta
+      property="og:description"
+      content="Fil d'actualité, stories et vie du campus : une interface en HTML et CSS modernes, sans framework."
+    >
+    <link rel="icon" href="assets/images/brand/favicon.svg" type="image/svg+xml">
 
-    <!------------NAV------------>
-    
-    <nav class="nav">
-        <div class="container">
-            <h2 class="log">Post it</h2>
-            <div class="search-bar">
-                <img src="./icons/search.svg" alt="chercher" class="icons">
-                <input type="search" name="search" id="search" placeholder="Chercher un créateur, une inspiration ou un projet">
-            </div>
-            
-            <div class="create">
-                <label for="create-post" class="btn btn-primary">créer</label>
-                <div class="theme">
-                    <img src="./icons/sun.svg" class="icons">
-                    <div class="input">
-                        <div class="bull"></div>
-                    </div>
-                    <img src="./icons/moon.svg" class="icons">
-                </div>
-                <div class="profile-picture">
-                    <img src="./img/profil-person1-small.jpg" alt="photo de profil">
-                </div>
-            </div>
+    <!-- Styles : l'ordre des couches est fixé dans tokens.css, l'ordre des liens importe peu. -->
+    <link rel="stylesheet" href="assets/css/fonts.css">
+    <link rel="stylesheet" href="assets/css/tokens.css">
+    <link rel="stylesheet" href="assets/css/base.css">
+    <link rel="stylesheet" href="assets/css/layout.css">
+    <link rel="stylesheet" href="assets/css/components/button.css">
+    <link rel="stylesheet" href="assets/css/components/avatar.css">
+    <link rel="stylesheet" href="assets/css/components/sidebar.css">
+    <link rel="stylesheet" href="assets/css/components/feed.css">
+    <link rel="stylesheet" href="assets/css/components/post.css">
+    <link rel="stylesheet" href="assets/css/components/popover.css">
+    <link rel="stylesheet" href="assets/css/components/composer.css">
+    <link rel="stylesheet" href="assets/css/components/stories.css">
+    <link rel="stylesheet" href="assets/css/components/suggestions.css">
+    <link rel="stylesheet" href="assets/css/components/topics.css">
+    <link rel="stylesheet" href="assets/css/components/toast.css">
+    <link rel="stylesheet" href="assets/css/utilities.css">
+
+    <!-- Applique le thème mémorisé avant le premier affichage (évite un flash). -->
+    <script>
+      try {
+        const theme = localStorage.getItem('postit-theme')
+        if (theme === 'light' || theme === 'dark') document.documentElement.dataset.theme = theme
+      } catch {}
+    </script>
+    <script src="assets/js/app.js" defer></script>
+  </head>
+
+  <body>
+    <a class="skip-link" href="#feed">Aller au fil d'actualité</a>
+
+    <!-- Sprite d'icônes (Phosphor Icons, MIT) + logo. Source : assets/icons/sprite.svg -->
+    <svg class="sprite" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false">
+      <defs>
+        <linearGradient id="logo-fill" x1="6" y1="5" x2="60" y2="60" gradientUnits="userSpaceOnUse">
+          <stop offset="0" stop-color="#5eead4"></stop>
+          <stop offset=".5" stop-color="#818cf8"></stop>
+          <stop offset="1" stop-color="#f472b6"></stop>
+        </linearGradient>
+        <radialGradient id="logo-glow" cx="50" cy="12" r="26" gradientUnits="userSpaceOnUse">
+          <stop offset="0" stop-color="#fde68a"></stop>
+          <stop offset="1" stop-color="#fde68a" stop-opacity="0"></stop>
+        </radialGradient>
+      </defs>
+      <symbol id="logo" viewBox="0 0 64 64">
+        <path fill="url(#logo-fill)" d="M33 5c14.9 0 27 10.6 27 25.5S47.9 56 33 56c-3.1 0-6-.5-8.8-1.3l-11.6 4.9a1.6 1.6 0 0 1-2.2-1.9l3-9.8C8.4 43.3 6 37.2 6 30.5 6 15.6 18.1 5 33 5Z"></path>
+        <path fill="url(#logo-glow)" d="M33 5c14.9 0 27 10.6 27 25.5S47.9 56 33 56c-3.1 0-6-.5-8.8-1.3l-11.6 4.9a1.6 1.6 0 0 1-2.2-1.9l3-9.8C8.4 43.3 6 37.2 6 30.5 6 15.6 18.1 5 33 5Z"></path>
+        <path fill="#fff" d="M25 19h16a4 4 0 0 1 4 4v10l-9 9H25a4 4 0 0 1-4-4V23a4 4 0 0 1 4-4Z"></path>
+        <path fill="#fff" fill-opacity=".55" d="M45 33h-6a3 3 0 0 0-3 3v6Z"></path>
+      </symbol>
+      <symbol id="icon-bookmark" viewBox="0 0 256 256"><path d="M184,32H72A16,16,0,0,0,56,48V224a8,8,0,0,0,12.24,6.78L128,193.43l59.77,37.35A8,8,0,0,0,200,224V48A16,16,0,0,0,184,32Zm0,177.57-51.77-32.35a8,8,0,0,0-8.48,0L72,209.57V48H184Z"></path></symbol>
+      <symbol id="icon-calendar" viewBox="0 0 256 256"><path d="M208,32H184V24a8,8,0,0,0-16,0v8H88V24a8,8,0,0,0-16,0v8H48A16,16,0,0,0,32,48V208a16,16,0,0,0,16,16H208a16,16,0,0,0,16-16V48A16,16,0,0,0,208,32Zm0,48H48V48H72v8a8,8,0,0,0,16,0V48h80v8a8,8,0,0,0,16,0V48h24Z"></path></symbol>
+      <symbol id="icon-caret-down" viewBox="0 0 256 256"><path d="M216.49,104.49l-80,80a12,12,0,0,1-17,0l-80-80a12,12,0,0,1,17-17L128,159l71.51-71.52a12,12,0,0,1,17,17Z"></path></symbol>
+      <symbol id="icon-chat" viewBox="0 0 256 256"><path d="M216,40H40A16,16,0,0,0,24,56V184a16,16,0,0,0,16,16h60.43l13.68,23.94a16,16,0,0,0,27.78,0L155.57,200H216a16,16,0,0,0,16-16V56A16,16,0,0,0,216,40ZM160,144H96a8,8,0,0,1,0-16h64a8,8,0,0,1,0,16Zm0-32H96a8,8,0,0,1,0-16h64a8,8,0,0,1,0,16Z"></path></symbol>
+      <symbol id="icon-chats" viewBox="0 0 256 256"><path d="M232.07,186.76a80,80,0,0,0-62.5-114.17A80,80,0,1,0,23.93,138.76l-7.27,24.71a16,16,0,0,0,19.87,19.87l24.71-7.27a80.39,80.39,0,0,0,25.18,7.35,80,80,0,0,0,108.34,40.65l24.71,7.27a16,16,0,0,0,19.87-19.86Zm-16.25,1.47L224,216l-27.76-8.17a8,8,0,0,0-6,.63,64.05,64.05,0,0,1-85.87-24.88A79.93,79.93,0,0,0,174.7,89.71a64,64,0,0,1,41.75,92.48A8,8,0,0,0,215.82,188.23Z"></path></symbol>
+      <symbol id="icon-check" viewBox="0 0 256 256"><path d="M232.49,80.49l-128,128a12,12,0,0,1-17,0l-56-56a12,12,0,1,1,17-17L96,183,215.51,63.51a12,12,0,0,1,17,17Z"></path></symbol>
+      <symbol id="icon-compass" viewBox="0 0 256 256"><path d="M128,24A104,104,0,1,0,232,128,104.11,104.11,0,0,0,128,24Zm51.58,57.79-32,64a4.08,4.08,0,0,1-1.79,1.79l-64,32a4,4,0,0,1-5.37-5.37l32-64a4.08,4.08,0,0,1,1.79-1.79l64-32A4,4,0,0,1,179.58,81.79Z"></path></symbol>
+      <symbol id="icon-cooking-pot" viewBox="0 0 256 256"><path d="M88,48V16a8,8,0,0,1,16,0V48a8,8,0,0,1-16,0Zm40,8a8,8,0,0,0,8-8V16a8,8,0,0,0-16,0V48A8,8,0,0,0,128,56Zm32,0a8,8,0,0,0,8-8V16a8,8,0,0,0-16,0V48A8,8,0,0,0,160,56Zm94.4,35.2a8,8,0,0,0-11.2-1.6L224,104V80a8,8,0,0,0-8-8H40a8,8,0,0,0-8,8v24L12.8,89.6a8,8,0,0,0-9.6,12.8L32,124v60a32,32,0,0,0,32,32H192a32,32,0,0,0,32-32V124l28.8-21.6A8,8,0,0,0,254.4,91.2Z"></path></symbol>
+      <symbol id="icon-dots-vertical" viewBox="0 0 256 256"><path d="M112,60a16,16,0,1,1,16,16A16,16,0,0,1,112,60Zm16,52a16,16,0,1,0,16,16A16,16,0,0,0,128,112Zm0,68a16,16,0,1,0,16,16A16,16,0,0,0,128,180Z"></path></symbol>
+      <symbol id="icon-download" viewBox="0 0 256 256"><path d="M224,144v64a8,8,0,0,1-8,8H40a8,8,0,0,1-8-8V144a8,8,0,0,1,16,0v56H208V144a8,8,0,0,1,16,0Zm-101.66,5.66a8,8,0,0,0,11.32,0l40-40A8,8,0,0,0,168,96H136V32a8,8,0,0,0-16,0V96H88a8,8,0,0,0-5.66,13.66Z"></path></symbol>
+      <symbol id="icon-envelope" viewBox="0 0 256 256"><path d="M224,48H32a8,8,0,0,0-8,8V192a16,16,0,0,0,16,16H216a16,16,0,0,0,16-16V56A8,8,0,0,0,224,48Zm-8,144H40V74.19l82.59,75.71a8,8,0,0,0,10.82,0L216,74.19V192Z"></path></symbol>
+      <symbol id="icon-eye" viewBox="0 0 256 256"><path d="M247.31,124.76c-.35-.79-8.82-19.58-27.65-38.41C194.57,61.26,162.88,48,128,48S61.43,61.26,36.34,86.35C17.51,105.18,9,124,8.69,124.76a8,8,0,0,0,0,6.5c.35.79,8.82,19.57,27.65,38.4C61.43,194.74,93.12,208,128,208s66.57-13.26,91.66-38.34c18.83-18.83,27.3-37.61,27.65-38.4A8,8,0,0,0,247.31,124.76ZM128,168a40,40,0,1,1,40-40A40,40,0,0,1,128,168Z"></path></symbol>
+      <symbol id="icon-file" viewBox="0 0 256 256"><path d="M232,88V200.89A15.13,15.13,0,0,1,216.89,216H40a16,16,0,0,1-16-16V64A16,16,0,0,1,40,48H93.33a16.12,16.12,0,0,1,9.6,3.2L130.67,72H216A16,16,0,0,1,232,88Z"></path></symbol>
+      <symbol id="icon-flag" viewBox="0 0 256 256"><path d="M42.76,50A8,8,0,0,0,40,56V224a8,8,0,0,0,16,0V179.77c26.79-21.16,49.87-9.75,76.45,3.41,16.4,8.11,34.06,16.85,53,16.85,13.93,0,28.54-4.75,43.82-18a8,8,0,0,0,2.76-6V56A8,8,0,0,0,218.76,50c-28,24.23-51.72,12.49-79.21-1.12C111.07,34.76,78.78,18.79,42.76,50ZM216,172.25c-26.79,21.16-49.87,9.74-76.45-3.41-25-12.35-52.81-26.13-83.55-8.4V59.79c26.79-21.16,49.87-9.75,76.45,3.4,25,12.35,52.82,26.13,83.55,8.4Z"></path></symbol>
+      <symbol id="icon-gear" viewBox="0 0 256 256"><path d="M237.94,107.21a8,8,0,0,0-3.89-5.4l-29.83-17-.12-33.62a8,8,0,0,0-2.83-6.08,111.91,111.91,0,0,0-36.72-20.67,8,8,0,0,0-6.46.59L128,41.85,97.88,25a8,8,0,0,0-6.47-.6A111.92,111.92,0,0,0,54.73,45.15a8,8,0,0,0-2.83,6.07l-.15,33.65-29.83,17a8,8,0,0,0-3.89,5.4,106.47,106.47,0,0,0,0,41.56,8,8,0,0,0,3.89,5.4l29.83,17,.12,33.63a8,8,0,0,0,2.83,6.08,111.91,111.91,0,0,0,36.72,20.67,8,8,0,0,0,6.46-.59L128,214.15,158.12,231a7.91,7.91,0,0,0,3.9,1,8.09,8.09,0,0,0,2.57-.42,112.1,112.1,0,0,0,36.68-20.73,8,8,0,0,0,2.83-6.07l.15-33.65,29.83-17a8,8,0,0,0,3.89-5.4A106.47,106.47,0,0,0,237.94,107.21ZM128,168a40,40,0,1,1,40-40A40,40,0,0,1,128,168Z"></path></symbol>
+      <symbol id="icon-globe" viewBox="0 0 256 256"><path d="M128,24A104,104,0,1,0,232,128,104.11,104.11,0,0,0,128,24Zm88,104a87.62,87.62,0,0,1-6.4,32.94l-44.7-27.49a15.92,15.92,0,0,0-6.24-2.23l-22.82-3.08a16.11,16.11,0,0,0-16,7.86h-8.72l-3.8-7.86a15.91,15.91,0,0,0-11-8.67l-8-1.73L96.14,104h16.71a16.06,16.06,0,0,0,7.73-2l12.25-6.76a16.62,16.62,0,0,0,3-2.14l26.91-24.34A15.93,15.93,0,0,0,166,49.1l-.36-.65A88.11,88.11,0,0,1,216,128ZM40,128a87.53,87.53,0,0,1,8.54-37.8l11.34,30.27a16,16,0,0,0,11.62,10l21.43,4.61L96.74,143a16.09,16.09,0,0,0,14.4,9h1.48l-7.23,16.23a16,16,0,0,0,2.86,17.37l.14.14L128,205.94l-1.94,10A88.11,88.11,0,0,1,40,128Z"></path></symbol>
+      <symbol id="icon-heart" viewBox="0 0 256 256"><path d="M240,102c0,70-103.79,126.66-108.21,129a8,8,0,0,1-7.58,0C119.79,228.66,16,172,16,102A62.07,62.07,0,0,1,78,40c20.65,0,38.73,8.88,50,23.89C139.27,48.88,157.35,40,178,40A62.07,62.07,0,0,1,240,102Z"></path></symbol>
+      <symbol id="icon-image" viewBox="0 0 256 256"><path d="M216,40H40A16,16,0,0,0,24,56V200a16,16,0,0,0,16,16H216a16,16,0,0,0,16-16V56A16,16,0,0,0,216,40ZM156,88a12,12,0,1,1-12,12A12,12,0,0,1,156,88Zm60,112H40V160.69l46.34-46.35a8,8,0,0,1,11.32,0h0L165,181.66a8,8,0,0,0,11.32-11.32l-17.66-17.65L173,138.34a8,8,0,0,1,11.31,0L216,170.07V200Z"></path></symbol>
+      <symbol id="icon-link" viewBox="0 0 256 256"><path d="M165.66,90.34a8,8,0,0,1,0,11.32l-64,64a8,8,0,0,1-11.32-11.32l64-64A8,8,0,0,1,165.66,90.34ZM215.6,40.4a56,56,0,0,0-79.2,0L106.34,70.45a8,8,0,0,0,11.32,11.32l30.06-30a40,40,0,0,1,56.57,56.56l-30.07,30.06a8,8,0,0,0,11.31,11.32L215.6,119.6a56,56,0,0,0,0-79.2ZM138.34,174.22l-30.06,30.06a40,40,0,1,1-56.56-56.57l30.05-30.05a8,8,0,0,0-11.32-11.32L40.4,136.4a56,56,0,0,0,79.2,79.2l30.06-30.07a8,8,0,0,0-11.32-11.31Z"></path></symbol>
+      <symbol id="icon-map-pin" viewBox="0 0 256 256"><path d="M128,16a88.1,88.1,0,0,0-88,88c0,75.3,80,132.17,83.41,134.55a8,8,0,0,0,9.18,0C136,236.17,216,179.3,216,104A88.1,88.1,0,0,0,128,16Zm0,56a32,32,0,1,1-32,32A32,32,0,0,1,128,72Z"></path></symbol>
+      <symbol id="icon-moon" viewBox="0 0 256 256"><path d="M235.54,150.21a104.84,104.84,0,0,1-37,52.91A104,104,0,0,1,32,120,103.09,103.09,0,0,1,52.88,57.48a104.84,104.84,0,0,1,52.91-37,8,8,0,0,1,10,10,88.08,88.08,0,0,0,109.8,109.8,8,8,0,0,1,10,10Z"></path></symbol>
+      <symbol id="icon-mountains" viewBox="0 0 256 256"><path d="M254.88,195.92l-54.56-92.08A15.87,15.87,0,0,0,186.55,96h0a15.85,15.85,0,0,0-13.76,7.84l-15.64,26.39a4,4,0,0,0,0,4.07l26.8,45.47a8.13,8.13,0,0,1-1.89,10.55,8,8,0,0,1-11.8-2.26L101.79,71.88a16,16,0,0,0-27.58,0L1.11,195.94a8,8,0,0,0,1,9.52A8.23,8.23,0,0,0,8.23,208H247.77a8.29,8.29,0,0,0,6.09-2.55A8,8,0,0,0,254.88,195.92ZM64.43,120,88,80l23.57,40ZM140,52a24,24,0,1,1,24,24A24,24,0,0,1,140,52Z"></path></symbol>
+      <symbol id="icon-music-notes" viewBox="0 0 256 256"><path d="M212.92,17.71a7.89,7.89,0,0,0-6.86-1.46l-128,32A8,8,0,0,0,72,56V166.1A36,36,0,1,0,88,196V102.25l112-28V134.1A36,36,0,1,0,216,164V24A8,8,0,0,0,212.92,17.71Z"></path></symbol>
+      <symbol id="icon-paper-plane" viewBox="0 0 256 256"><path d="M231.4,44.34s0,.1,0,.15l-58.2,191.94a15.88,15.88,0,0,1-14,11.51q-.69.06-1.38.06a15.86,15.86,0,0,1-14.42-9.15L107,164.15a4,4,0,0,1,.77-4.58l57.92-57.92a8,8,0,0,0-11.31-11.31L96.43,148.26a4,4,0,0,1-4.58.77L17.08,112.64a16,16,0,0,1,2.49-29.8l191.94-58.2.15,0A16,16,0,0,1,231.4,44.34Z"></path></symbol>
+      <symbol id="icon-pen-nib" viewBox="0 0 256 256"><path d="M243.31,81.36,174.63,12.68a16,16,0,0,0-22.63,0L123.56,41.12l-58,21.76A16,16,0,0,0,55.36,75.23L34.59,199.83a4,4,0,0,0,6.77,3.49l57-57a23.85,23.85,0,0,1-2.29-12.08,24,24,0,1,1,13.6,23.4l-57,57a4,4,0,0,0,3.49,6.77l124.61-20.77a16,16,0,0,0,12.35-10.16l21.77-58.07L243.31,104a16,16,0,0,0,0-22.63ZM208,116.68,139.32,48l24-24L232,92.68Z"></path></symbol>
+      <symbol id="icon-plus" viewBox="0 0 256 256"><path d="M228,128a12,12,0,0,1-12,12H140v76a12,12,0,0,1-24,0V140H40a12,12,0,0,1,0-24h76V40a12,12,0,0,1,24,0v76h76A12,12,0,0,1,228,128Z"></path></symbol>
+      <symbol id="icon-smiley" viewBox="0 0 256 256"><path d="M128,24A104,104,0,1,0,232,128,104.11,104.11,0,0,0,128,24Zm0,192a88,88,0,1,1,88-88A88.1,88.1,0,0,1,128,216ZM80,108a12,12,0,1,1,12,12A12,12,0,0,1,80,108Zm96,0a12,12,0,1,1-12-12A12,12,0,0,1,176,108Zm-1.07,48c-10.29,17.79-27.4,28-46.93,28s-36.63-10.2-46.92-28a8,8,0,1,1,13.84-8c7.47,12.91,19.21,20,33.08,20s25.61-7.1,33.07-20a8,8,0,0,1,13.86,8Z"></path></symbol>
+      <symbol id="icon-sun" viewBox="0 0 256 256"><path d="M120,40V16a8,8,0,0,1,16,0V40a8,8,0,0,1-16,0Zm8,24a64,64,0,1,0,64,64A64.07,64.07,0,0,0,128,64ZM58.34,69.66A8,8,0,0,0,69.66,58.34l-16-16A8,8,0,0,0,42.34,53.66Zm0,116.68-16,16a8,8,0,0,0,11.32,11.32l16-16a8,8,0,0,0-11.32-11.32ZM192,72a8,8,0,0,0,5.66-2.34l16-16a8,8,0,0,0-11.32-11.32l-16,16A8,8,0,0,0,192,72Zm5.66,114.34a8,8,0,0,0-11.32,11.32l16,16a8,8,0,0,0,11.32-11.32ZM48,128a8,8,0,0,0-8-8H16a8,8,0,0,0,0,16H40A8,8,0,0,0,48,128Zm80,80a8,8,0,0,0-8,8v24a8,8,0,0,0,16,0V216A8,8,0,0,0,128,208Zm112-88H216a8,8,0,0,0,0,16h24a8,8,0,0,0,0-16Z"></path></symbol>
+      <symbol id="icon-users" viewBox="0 0 256 256"><path d="M164.47,195.63a8,8,0,0,1-6.7,12.37H10.23a8,8,0,0,1-6.7-12.37,95.83,95.83,0,0,1,47.22-37.71,60,60,0,1,1,66.5,0A95.83,95.83,0,0,1,164.47,195.63Zm87.91-.15a95.87,95.87,0,0,0-47.13-37.56A60,60,0,0,0,144.7,54.59a4,4,0,0,0-1.33,6A75.83,75.83,0,0,1,147,150.53a4,4,0,0,0,1.07,5.53,112.32,112.32,0,0,1,29.85,30.83,23.92,23.92,0,0,1,3.65,16.47,4,4,0,0,0,3.95,4.64h60.3a8,8,0,0,0,7.73-5.93A8.22,8.22,0,0,0,252.38,195.48Z"></path></symbol>
+      <symbol id="icon-x" viewBox="0 0 256 256"><path d="M208.49,191.51a12,12,0,0,1-17,17L128,145,64.49,208.49a12,12,0,0,1-17-17L111,128,47.51,64.49a12,12,0,0,1,17-17L128,111l63.51-63.52a12,12,0,0,1,17,17L145,128Z"></path></symbol>
+    </svg>
+
+    <div class="app">
+      <h1 class="visually-hidden">Post it, le réseau social des étudiants de l'ESIS</h1>
+
+      <!-- Avatars flottants décoratifs autour de l'application (grands écrans uniquement) -->
+      <div class="app__decor" aria-hidden="true">
+        <img class="app__float app__float--1" src="assets/images/avatars/lolita-kabeya.webp" alt="" width="160" height="160">
+        <img class="app__float app__float--2" src="assets/images/avatars/jeremie-matabaro.webp" alt="" width="160" height="160">
+        <span class="app__dot app__dot--1"></span>
+        <span class="app__dot app__dot--2"></span>
+      </div>
+
+      <!-- ============ Colonne de gauche : profil + navigation ============ -->
+      <header class="sidebar">
+        <a class="profile" href="#profil">
+          <span class="profile__media">
+            <svg class="profile__logo" aria-hidden="true"><use href="#logo"></use></svg>
+            <img class="profile__avatar avatar" src="assets/images/avatars/ben-uzan.webp" alt="" width="160" height="160">
+          </span>
+          <span class="profile__name">Ben Uzan</span>
+          <span class="profile__handle"><span class="visually-hidden">, </span>@buzan</span>
+        </a>
+
+        <nav class="nav" aria-label="Navigation principale">
+          <ul class="nav__list" role="list">
+            <li>
+              <a class="nav__link" href="#feed" aria-current="page">
+                <svg class="icon" aria-hidden="true"><use href="#icon-compass"></use></svg>
+                <span class="nav__label">Fil d'actualité</span>
+              </a>
+            </li>
+            <li>
+              <a class="nav__link" href="#messages">
+                <svg class="icon" aria-hidden="true"><use href="#icon-envelope"></use></svg>
+                <span class="nav__label">Messages</span>
+                <span class="badge"><span class="visually-hidden">, </span>6<span class="visually-hidden"> non lus</span></span>
+              </a>
+            </li>
+            <li>
+              <a class="nav__link" href="#forums">
+                <svg class="icon" aria-hidden="true"><use href="#icon-chats"></use></svg>
+                <span class="nav__label">Forums</span>
+              </a>
+            </li>
+            <li>
+              <a class="nav__link" href="#amis">
+                <svg class="icon" aria-hidden="true"><use href="#icon-users"></use></svg>
+                <span class="nav__label">Amis</span>
+                <span class="badge"><span class="visually-hidden">, </span>3<span class="visually-hidden"> demandes</span></span>
+              </a>
+            </li>
+            <li>
+              <a class="nav__link" href="#agenda">
+                <svg class="icon" aria-hidden="true"><use href="#icon-calendar"></use></svg>
+                <span class="nav__label">Agenda</span>
+              </a>
+            </li>
+            <li>
+              <a class="nav__link" href="#parametres">
+                <svg class="icon" aria-hidden="true"><use href="#icon-gear"></use></svg>
+                <span class="nav__label">Paramètres</span>
+              </a>
+            </li>
+          </ul>
+        </nav>
+
+        <!-- Affiché par app.js : sans JavaScript, le thème suit simplement le système. -->
+        <button class="theme-switch" type="button" role="switch" aria-checked="false" hidden>
+          <svg class="icon theme-switch__icon" aria-hidden="true"><use href="#icon-moon"></use></svg>
+          <span class="theme-switch__label">Mode sombre</span>
+          <span class="theme-switch__track" aria-hidden="true"></span>
+        </button>
+
+        <a class="app-promo" href="#application">
+          <span class="app-promo__icon">
+            <svg aria-hidden="true"><use href="#logo"></use></svg>
+          </span>
+          <img class="app-promo__avatar app-promo__avatar--1 avatar" src="assets/images/avatars/olivier-ngoy.webp" alt="" width="160" height="160">
+          <img class="app-promo__avatar app-promo__avatar--2 avatar" src="assets/images/avatars/sarah-kalala.webp" alt="" width="160" height="160">
+          <img class="app-promo__avatar app-promo__avatar--3 avatar" src="assets/images/avatars/chris-ilunga.webp" alt="" width="160" height="160">
+          <span class="app-promo__label">Télécharger l'app</span>
+        </a>
+      </header>
+
+      <!-- ============ Colonne centrale : le fil ============ -->
+      <main class="feed" id="feed" tabindex="-1" aria-labelledby="feed-title">
+        <div class="feed__header">
+          <h2 class="feed__title" id="feed-title">Publications</h2>
+
+          <!-- Filtre 100 % CSS : les publications sont masquées via :has() selon le bouton coché. -->
+          <fieldset class="feed-filter">
+            <legend class="visually-hidden">Filtrer les publications</legend>
+            <label class="feed-filter__option">
+              <input class="feed-filter__input" type="radio" name="feed-filter" value="recent" checked>
+              Récents
+            </label>
+            <label class="feed-filter__option">
+              <input class="feed-filter__input" type="radio" name="feed-filter" value="friends">
+              Amis
+            </label>
+            <label class="feed-filter__option">
+              <input class="feed-filter__input" type="radio" name="feed-filter" value="popular">
+              Populaires
+            </label>
+          </fieldset>
         </div>
-    </nav>
 
-    <!------------MAIN------------>
-    
-    <main>
-        <div class="container">
-            <!------------LEFT------------>
-            <div class="left">
-                <a href="" class="profil">
-                    <div class="profile-picture">
-                        <img src="./img/profil-person1-small.jpg" alt="photo de profil">
-                    </div>
-                    <div class="handle">
-                        <h4>Ben Uzan</h4>
-                        <p class="text-muted">
-                            @buzan
-                        </p>
-                    </div>
-                </a>
-                <div class="sidebar">
-                    
-                    <a class="menu-items active">
-                        <img src="./icons/home.svg" alt="Accueil" class="icons">
-                        <h3>Accueil</h3>
-                    </a>
-                    
-                    <a class="menu-items">
-                        <img src="./icons/explore.svg" alt="explorer" class="icons">
-                        <h3>Explorer</h3>
-                    </a>
-                    
-                    <a id="notifications" class="menu-items notifications">
-                        <img src="./icons/bell.svg" alt="Notifications" class="icons">
-                        <small class="notification-count">9+</small>
-                        <h3>Notifications</h3>
+        <div class="feed__list">
+          <!-- ---------- Publication : galerie + mentions + réaction ---------- -->
+          <article class="post" id="post-1" data-tone="sky" data-friend data-popular aria-labelledby="post-1-author">
+            <header class="post__header">
+              <img class="avatar" src="assets/images/avatars/grace-mwamba.webp" alt="" width="160" height="160">
+              <div class="post__byline">
+                <h3 class="post__author" id="post-1-author"><a href="#grace-mwamba">Grâce Mwamba</a></h3>
+                <p class="post__meta"><time datetime="2026-11-14T08:15">il y a 2 heures</time></p>
+              </div>
+              <button class="icon-button post__more" type="button" popovertarget="post-1-menu" aria-label="Options de la publication">
+                <svg class="icon" aria-hidden="true"><use href="#icon-dots-vertical"></use></svg>
+              </button>
+              <div class="menu" id="post-1-menu" popover>
+                <ul class="menu__list" role="list">
+                  <li>
+                    <button class="menu__item" type="button" data-action="save">
+                      <svg class="icon" aria-hidden="true"><use href="#icon-bookmark"></use></svg>Enregistrer
+                    </button>
+                  </li>
+                  <li>
+                    <button class="menu__item" type="button" data-action="copy-link">
+                      <svg class="icon" aria-hidden="true"><use href="#icon-link"></use></svg>Copier le lien
+                    </button>
+                  </li>
+                  <li>
+                    <button class="menu__item menu__item--danger" type="button" data-action="report">
+                      <svg class="icon" aria-hidden="true"><use href="#icon-flag"></use></svg>Signaler
+                    </button>
+                  </li>
+                </ul>
+              </div>
+            </header>
 
-                        <!------------NOTIFICATIONS POPUP------------>
-                        <div class="notifications-popup">
-                            <div>
-                                <div class="profile-picture">
-                                    <img src="./img/profile-photo2-medium.jpg" alt="photo de profil">
-                                </div>
-                                <div class="notification-body">
-                                    <b>Théo Balick</b> a commenté une photo que vous aimé
-                                    <small class="text-muted">il y a 23min</small>
-                                </div>
-                            </div>
-                            <div>
-                                <div class="profile-picture">
-                                    <img src="./img/profile-photo2-medium.jpg" alt="photo de profil">
-                                </div>
-                                <div class="notification-body">
-                                    <b>Paul Kamena</b> a accepté votre invitation
-                                    <small class="text-muted">il y a 1h</small>
-                                </div>
-                            </div>
-                            <div>
-                                <div class="profile-picture">
-                                    <img src="./img/profile-photo2-medium.jpg" alt="photo de profil">
-                                </div>
-                                <div class="notification-body">
-                                    <b>Bavon Kalolo</b> a aimé votre photo
-                                    <small class="text-muted">il y a 1h</small>
-                                </div>
-                            </div>
-                            <div>
-                                <div class="profile-picture">
-                                    <img src="./img/profile-photo2-medium.jpg" alt="photo de profil">
-                                </div>
-                                <div class="notification-body">
-                                    <b>Nycla Kassaka</b> a commenté votre photo
-                                    <small class="text-muted">il y a 3h</small>
-                                </div>
-                            </div>
-                            <div>
-                                <div class="profile-picture">
-                                    <img src="./img/profile-photo2-medium.jpg" alt="photo de profil">
-                                </div>
-                                <div class="notification-body">
-                                    <b>Ferdinand Kahenga a commenté votre photo</b>
-                                    <small class="text-muted">il y a 5h</small>
-                                </div>
-                            </div>
-                        </div>
-                    </a>
-                    <!------------END NOTIFICATIONS POPUP------------>
-                    
-                    <a class="menu-items" id="messages-notification">
-                        <img src="./icons/message.svg" alt="Messages" class="icons">
-                        <small class="notification-count">6</small>
-                        <h3>Messages</h3>
-                    </a>
-                    
-                    <a class="menu-items">
-                        <img src="./icons/agenda.svg" alt="Evènements" class="icons">
-                        <h3>Agenda</h3>
-                    </a>
-                    
-                    <a class="menu-items">
-                        <img src="./icons/settings.svg " alt="Accueil" class="icons">
-                        <h3>Paramètres</h3>
-                    </a>
-                </div>
-                <!------------END OF SIDEBAR------------>
-                <label for="create-post" class="btn btn-primary">Créer un post</label>
+            <p class="post__text">
+              Salut tout le monde ! Aujourd'hui j'étais sur la plus belle montagne du monde 😍
+              Je fais aussi un coucou à
+              <a class="mention" href="#sarah-kalala"><img class="mention__avatar" src="assets/images/avatars/sarah-kalala.webp" alt="" width="160" height="160">Sarah</a>,
+              <a class="mention" href="#olivier-ngoy"><img class="mention__avatar" src="assets/images/avatars/olivier-ngoy.webp" alt="" width="160" height="160">Olivier</a>
+              et
+              <a class="mention" href="#divine-mukendi"><img class="mention__avatar" src="assets/images/avatars/divine-mukendi.webp" alt="" width="160" height="160">Divine</a> !
+            </p>
+
+            <div class="gallery" data-count="3">
+              <img class="gallery__item" src="assets/images/posts/hike-friends.webp" alt="Deux randonneurs, sac au dos, sur un sentier face aux sommets enneigés" width="480" height="640" loading="lazy" decoding="async">
+              <img class="gallery__item" src="assets/images/posts/wildflowers.webp" alt="Des pavots orange en fleurs sous un ciel bleu" width="480" height="640" loading="lazy" decoding="async">
+              <img class="gallery__item" src="assets/images/posts/snowy-peak.webp" alt="Un sommet enneigé qui domine une vallée de montagne" width="800" height="600" loading="lazy" decoding="async">
             </div>
-            <!--END OF LEFT-->
 
-            <!------------MIDDLE------------>
-            <div class="middle">
-
-                <!------------STORIES------------>
-                <div class="stories">
-                    <div class="story">
-                        <div class="profile-picture">
-                            <img src="./img/profil-person2-large.jpg" alt="photo de profil">
-                        </div>
-                        <p class="name">Ma story</p>
-                    </div>
-                    <div class="story">
-                        <div class="profile-picture">
-                            <img src="./img/profile-photo2-large.jpg" alt="photo de profil">
-                        </div>
-                        <p class="name">Eddysha Jabulani</p>
-                    </div>
-                    <div class="story">
-                        <div class="profile-picture">
-                            <img src="./img/profile-photo3-large.jpg" alt="photo de profil">
-                        </div>
-                        <p class="name">Georges Methens</p>
-                    </div>
-                    <div class="story">
-                        <div class="profile-picture">
-                            <img src="./img/profil-person2-large.jpg" alt="photo de profil">
-                        </div>
-                        <p class="name">John Shacko</p>
-                    </div>
-                    <div class="story">
-                        <div class="profile-picture">
-                            <img src="./img/profil-person2-large.jpg" alt="photo de profil">
-                        </div>
-                        <p class="name">Théo Balick</p>
-                    </div>
-                    <div class="story">
-                        <div class="profile-picture">
-                            <img src="./img/profil-person2-large.jpg" alt="photo de profil">
-                        </div>
-                        <p class="name">Michael Mbambi</p>
-                    </div>
+            <footer class="post__footer">
+              <p class="post__stat">
+                <svg class="icon" aria-hidden="true"><use href="#icon-eye"></use></svg>
+                6 355<span class="visually-hidden"> vues</span>
+              </p>
+              <button class="post__action post__like" type="button" aria-pressed="false" data-action="like">
+                <svg class="icon" aria-hidden="true"><use href="#icon-heart"></use></svg>J'aime
+              </button>
+              <a class="post__action" href="#post-1-comments">
+                <svg class="icon" aria-hidden="true"><use href="#icon-chat"></use></svg>Commenter
+              </a>
+              <div class="reaction" data-reacted>
+                <button class="reaction__trigger" type="button" popovertarget="post-1-reactions">
+                  <span class="visually-hidden">Votre réaction : </span>
+                  <span class="reaction__emoji" aria-hidden="true">🔥</span>
+                  <span class="reaction__label">Wouah !</span>
+                </button>
+                <div class="emoji-picker reaction__picker" id="post-1-reactions" popover>
+                  <button class="emoji-picker__option" type="button" data-action="react" data-emoji="🔥" aria-label="Wouah !">🔥</button>
+                  <button class="emoji-picker__option" type="button" data-action="react" data-emoji="😍" aria-label="J'adore">😍</button>
+                  <button class="emoji-picker__option" type="button" data-action="react" data-emoji="😂" aria-label="Trop drôle">😂</button>
+                  <button class="emoji-picker__option" type="button" data-action="react" data-emoji="😮" aria-label="Impressionnant">😮</button>
+                  <button class="emoji-picker__option" type="button" data-action="react" data-emoji="👏" aria-label="Bravo">👏</button>
+                  <button class="emoji-picker__close" type="button" popovertarget="post-1-reactions" popovertargetaction="hide" aria-label="Fermer">
+                    <svg class="icon" aria-hidden="true"><use href="#icon-x"></use></svg>
+                  </button>
                 </div>
-                <!------------END OF STORIES------------>
-                <div class="create-post">
-                    <div class="profile-picture">
-                        <img src="./img/profile-photo3-large.jpg" alt="photo de profile">
-                    </div>
-                    <input type="text" placeholder="Qu'est-ce qui te préocupe, Ben" id="create-post">
-                    <input type="submit" value="Poster" class="btn btn-primary">
+              </div>
+            </footer>
+          </article>
+
+          <!-- ---------- Publication : texte seul ---------- -->
+          <article class="post" id="post-2" data-tone="cream" data-friend aria-labelledby="post-2-author">
+            <header class="post__header">
+              <img class="avatar" src="assets/images/avatars/jeremie-matabaro.webp" alt="" width="160" height="160">
+              <div class="post__byline">
+                <h3 class="post__author" id="post-2-author"><a href="#jeremie-matabaro">Jérémie Matabaro</a></h3>
+                <p class="post__meta"><time datetime="2026-11-14T07:05">il y a 3 heures</time></p>
+              </div>
+              <button class="icon-button post__more" type="button" popovertarget="post-2-menu" aria-label="Options de la publication">
+                <svg class="icon" aria-hidden="true"><use href="#icon-dots-vertical"></use></svg>
+              </button>
+              <div class="menu" id="post-2-menu" popover>
+                <ul class="menu__list" role="list">
+                  <li>
+                    <button class="menu__item" type="button" data-action="save">
+                      <svg class="icon" aria-hidden="true"><use href="#icon-bookmark"></use></svg>Enregistrer
+                    </button>
+                  </li>
+                  <li>
+                    <button class="menu__item" type="button" data-action="copy-link">
+                      <svg class="icon" aria-hidden="true"><use href="#icon-link"></use></svg>Copier le lien
+                    </button>
+                  </li>
+                  <li>
+                    <button class="menu__item menu__item--danger" type="button" data-action="report">
+                      <svg class="icon" aria-hidden="true"><use href="#icon-flag"></use></svg>Signaler
+                    </button>
+                  </li>
+                </ul>
+              </div>
+            </header>
+
+            <p class="post__text">
+              J'ai pris un café incroyable aujourd'hui à la cafèt' du campus : un latte au lait de coco 🥥…
+              délicieux, vraiment trop bon !!! 😋 Allez le goûter avant qu'il n'y en ait plus.
+            </p>
+
+            <footer class="post__footer">
+              <p class="post__stat">
+                <svg class="icon" aria-hidden="true"><use href="#icon-eye"></use></svg>
+                2 418<span class="visually-hidden"> vues</span>
+              </p>
+              <button class="post__action post__like" type="button" aria-pressed="false" data-action="like">
+                <svg class="icon" aria-hidden="true"><use href="#icon-heart"></use></svg>J'aime
+              </button>
+              <a class="post__action" href="#post-2-comments">
+                <svg class="icon" aria-hidden="true"><use href="#icon-chat"></use></svg>Commenter
+              </a>
+              <div class="reaction">
+                <button class="reaction__trigger" type="button" popovertarget="post-2-reactions">
+                  <span class="visually-hidden">Votre réaction : </span>
+                  <span class="reaction__emoji" aria-hidden="true">🙂</span>
+                  <span class="reaction__label">Réagir</span>
+                </button>
+                <div class="emoji-picker reaction__picker" id="post-2-reactions" popover>
+                  <button class="emoji-picker__option" type="button" data-action="react" data-emoji="🔥" aria-label="Wouah !">🔥</button>
+                  <button class="emoji-picker__option" type="button" data-action="react" data-emoji="😍" aria-label="J'adore">😍</button>
+                  <button class="emoji-picker__option" type="button" data-action="react" data-emoji="😂" aria-label="Trop drôle">😂</button>
+                  <button class="emoji-picker__option" type="button" data-action="react" data-emoji="😮" aria-label="Impressionnant">😮</button>
+                  <button class="emoji-picker__option" type="button" data-action="react" data-emoji="👏" aria-label="Bravo">👏</button>
+                  <button class="emoji-picker__close" type="button" popovertarget="post-2-reactions" popovertargetaction="hide" aria-label="Fermer">
+                    <svg class="icon" aria-hidden="true"><use href="#icon-x"></use></svg>
+                  </button>
                 </div>
-            
-                <!------------FEEDS------------>
-                <div class="feeds">
-                    <!------------FEED------------>
-                    <div class="feed">
-                        <div class="head">
-                            <div class="user">
-                                <div class="profile-picture">
-                                    <img src="./img/profile-photo2-large.jpg" alt="photo de profil">
-                                </div>
-                                <div class="ingo">
-                                    <h3>Jérémie Matabaro</h3>
-                                    <small>Lubumbashi, il y a 20min</small>
-                                </div>
-                            </div>
-                            <span class="edit"><img src="./icons/more.svg" alt="edit" class="icons"></span>
-                        </div>
-                        <div class="photo">
-                            <img src="./img/post1.jpg" alt="photo postée">
-                        </div>
-            
-                        <div class="action-buttons">
-                            <div class="interaction-buttons">
-                                <span><img src="./icons/hearth.svg" alt="j'aime" class="icons"></span>
-                                <small class="like">69</small>
-                                <span><img src="./icons/comment.svg" alt="commenter" class="icons"></span>
-                                <small class="comment">552</small>
-                                <span><img src="./icons/share.svg" alt="partage" class="icons"></span>
-                                <small class="shared">1</small>
-                            </div>
-                            <div class="bookmark">
-                                <span><img src="./icons/favorie.svg" alt="favorie" class="icons"></span>
-                            </div>
-                        </div>
-            
-                        <div class="liked-by">
-                            <span><img src="./img/profile-photo2-medium.jpg" alt="j'ame" class="icons"></span>
-                            <span><img src="./img/profil-person2-large.jpg" alt="j'ame" class="icons"></span>
-                            <span><img src="./img/profile-photo3-large.jpg" alt="j'ame" class="icons"></span>
-                            <p>Aimé par <b>Joseph Numbi</b>, <b>Bérénice</b>, <b>Nicolas</b> et 66 autres personnes</p>
-                        </div>
-            
-                        <div class="caption">
-                            <b>Bavon Kalolo </b> Lorem ipsum, dolor sit amet consectetur adipisicing elit. Obcaecati, alias illum enim aliquam similique 
-                            <span class="harsh-tag">#lifestyle</span>
-                        </div>
-            
-                        <div class="text-muted comments">
-                            Voir Tout les 552 commentaires
-                        </div>
-                    </div>
-            
-                    <div class="feed">
-                        <div class="head">
-                            <div class="user">
-                                <div class="profile-picture">
-                                    <img src="./img/profile-photo2-large.jpg" alt="photo de profil">
-                                </div>
-                                <div class="ingo">
-                                    <h3>Bavon Kalolo</h3>
-                                    <small>Lubumbashi, il y a 20min</small>
-                                </div>
-                            </div>
-                            <span class="edit"><img src="./icons/more.svg" alt="edit" class="icons"></span>
-                        </div>
-                        <div class="photo">
-                            <img src="./img/story5.jpg" alt="photo postée">
-                        </div>
+              </div>
+            </footer>
+          </article>
 
-                        <div class="action-buttons">
-                            <div class="interaction-buttons">
-                                <span><img src="./icons/hearthred.svg" alt="j'aime" class="icons"></span>
-                                <small class="like">369</small>
-                                <span><img src="./icons/comment2.svg" alt="commenter" class="icons"></span>
-                                <small class="comment">402</small>
-                                <span><img src="./icons/share.svg" alt="partage" class="icons"></span>
-                                <small class="shared">5</small>
-                            </div>
-                            <div class="bookmark">
-                                <span><img src="./icons/favorie.svg" alt="favorie" class="icons"></span>
-                            </div>
-                        </div>
-            
-                        <div class="liked-by">
-                            <span><img src="./img/profile-photo2-medium.jpg" alt="j'ame" class="icons"></span>
-                            <span><img src="./img/profil-person2-large.jpg" alt="j'ame" class="icons"></span>
-                            <span><img src="./img/profile-photo3-large.jpg" alt="j'ame" class="icons"></span>
-                            <p>Aimé par <b>Georges</b>, <b>Bavon</b>, <b>Ruth</b> et 366 autres personnes</p>
-                        </div>
-            
-                        <div class="caption">
-                            <b>Bavon Kalolo </b> Lorem ipsum, dolor sit amet consectetur adipisicing elit. Obcaecati, alias illum enim aliquam similique asperiores consequuntur assumenda sequi omnis labore voluptates cum ab, perferendis nihil fugiat repellendus amet culpa corrupti!
-                            <span class="harsh-tag">#lifestyle</span>
-                        </div>
-            
-                        <div class="text-muted comments">
-                            Voir Tout les 402 commentaires
-                        </div>
-                    </div>
-            
-                    <div class="feed">
-                        <div class="head">
-                            <div class="user">
-                                <div class="profile-picture">
-                                    <img src="./img/profile-photo2-large.jpg" alt="photo de profil">
-                                </div>
-                                <div class="ingo">
-                                    <h3>Merveille Tshibanda</h3>
-                                    <small>Lubumbashi, il y a 21min</small>
-                                </div>
-                            </div>
-                            <span class="edit"><img src="./icons/more.svg" alt="edit" class="icons"></span>
-                        </div>
-                        <div class="photo">
-                            <img src="./img/post2.jpg" alt="photo postée">
-                        </div>
+          <!-- ---------- Publication : annonce avec une image ---------- -->
+          <article class="post" id="post-3" data-tone="mint" data-popular aria-labelledby="post-3-author">
+            <header class="post__header">
+              <span class="avatar avatar--initials" data-tone="violet" aria-hidden="true">CD</span>
+              <div class="post__byline">
+                <h3 class="post__author" id="post-3-author"><a href="#club-dev">Club Dev ESIS</a></h3>
+                <p class="post__meta"><time datetime="2026-11-14T05:30">il y a 5 heures</time></p>
+              </div>
+              <button class="icon-button post__more" type="button" popovertarget="post-3-menu" aria-label="Options de la publication">
+                <svg class="icon" aria-hidden="true"><use href="#icon-dots-vertical"></use></svg>
+              </button>
+              <div class="menu" id="post-3-menu" popover>
+                <ul class="menu__list" role="list">
+                  <li>
+                    <button class="menu__item" type="button" data-action="save">
+                      <svg class="icon" aria-hidden="true"><use href="#icon-bookmark"></use></svg>Enregistrer
+                    </button>
+                  </li>
+                  <li>
+                    <button class="menu__item" type="button" data-action="copy-link">
+                      <svg class="icon" aria-hidden="true"><use href="#icon-link"></use></svg>Copier le lien
+                    </button>
+                  </li>
+                  <li>
+                    <button class="menu__item menu__item--danger" type="button" data-action="report">
+                      <svg class="icon" aria-hidden="true"><use href="#icon-flag"></use></svg>Signaler
+                    </button>
+                  </li>
+                </ul>
+              </div>
+            </header>
 
-                        <div class="action-buttons">
-                            <div class="interaction-buttons">
-                                <span><img src="./icons/hearth.svg" alt="j'aime" class="icons"></span>
-                                <small class="like">898</small>
-                                <span><img src="./icons/comment2.svg" alt="commenter" class="icons"></span>
-                                <small class="comment">36</small>
-                                <span><img src="./icons/share.svg" alt="partage" class="icons"></span>
-                                <small class="shared"></small>
-                            </div>
-                            <div class="bookmark">
-                                <span><img src="./icons/favorie.svg" alt="favorie" class="icons"></span>
-                            </div>
-                        </div>
-            
-                        <div class="liked-by">
-                            <span><img src="./img/profile-photo2-medium.jpg" alt="j'ame" class="icons"></span>
-                            <span><img src="./img/profil-person2-large.jpg" alt="j'ame" class="icons"></span>
-                            <span><img src="./img/profile-photo3-large.jpg" alt="j'ame" class="icons"></span>
-                            <p>Aimé par <b>Cevick</b>, <b>Keith</b>, <b>Jeancy</b> et 895 autres personnes</p>
-                        </div>
-            
-                        <div class="caption">
-                            <b>Théo Balick </b> Lorem ipsum, dolor sit amet consectetur adipisicing elit. Obcaecati, alias illum enim aliquam similique asperiores consequuntur assumenda sequi omnis labore voluptates cum ab, perferendis nihil fugiat repellendus amet culpa corrupti!
-                            <span class="harsh-tag">#lifestyle</span>
-                        </div>
-            
-                        <div class="text-muted comments">
-                            Voir Tout les 36 commentaires
-                        </div>
-                    </div>
-            
-                    <div class="feed">
-                        <div class="head">
-                            <div class="user">
-                                <div class="profile-picture">
-                                    <img src="./img/profile-photo2-large.jpg" alt="photo de profil">
-                                </div>
-                                <div class="ingo">
-                                    <h3>Jonathan Mbal</h3>
-                                    <small>Lubumbashi, il y a 26min</small>
-                                </div>
-                            </div>
-                            <span class="edit"><img src="./icons/more.svg" alt="edit" class="icons"></span>
-                        </div>
-                        <div class="photo">
-                            <img src="./img/post3.jpg" alt="photo postée">
-                        </div>
+            <p class="post__text">
+              🚀 Hackathon ESIS ce samedi ! 24 heures pour construire une application utile au campus.
+              Équipes de 3 à 5, inscriptions ouvertes jusqu'à jeudi soir.
+              <a class="hashtag" href="#hackathon">#hackathon</a>
+              <a class="hashtag" href="#esis">#esis</a>
+            </p>
 
-                        <div class="action-buttons">
-                            <div class="interaction-buttons">
-                                <span><img src="./icons/hearth.svg" alt="j'aime" class="icons"></span>
-                                <span><img src="./icons/comment.svg" alt="commenter" class="icons"></span>
-                                <span><img src="./icons/share.svg" alt="partage" class="icons"></span>
-                            </div>
-                            <div class="bookmark">
-                                <span><img src="./icons/favorie.svg" alt="favorie" class="icons"></span>
-                            </div>
-                        </div>
-            
-                        <div class="liked-by">
-                            <span><img src="./img/profile-photo2-medium.jpg" alt="j'ame" class="icons"></span>
-                            <span><img src="./img/profil-person2-large.jpg" alt="j'ame" class="icons"></span>
-                            <span><img src="./img/profile-photo3-large.jpg" alt="j'ame" class="icons"></span>
-                            <p>Aimé par <b>Paul</b>, <b>Matabaro</b>, <b>Christelle</b> et 6 autres personnes</p>
-                        </div>
-            
-                        <div class="caption">
-                            <b>Bavon Kalolo </b> Lorem ipsum, dolor sit amet consectetur adipisicing elit. Obcaecati, alias illum enim aliquam 
-                            <span class="harsh-tag">#lifestyle</span>
-                        </div>
-            
-                        <div class="text-muted comments">
-                            Voir Tout les 42 commentaires
-                        </div>
-                    </div>
-            
-                    <div class="feed">
-                        <div class="head">
-                            <div class="user">
-                                <div class="profile-picture">
-                                    <img src="./img/profile-photo2-large.jpg" alt="photo de profil">
-                                </div>
-                                <div class="ingo">
-                                    <h3>John Shacko</h3>
-                                    <small>Lubumbashi, il y a 40min</small>
-                                </div>
-                            </div>
-                            <span class="edit"><img src="./icons/more.svg" alt="edit" class="icons"></span>
-                        </div>
-                        <div class="photo">
-                            <img src="./img/post4.jpg" alt="photo postée">
-                        </div>
-
-                        <div class="action-buttons">
-                            <div class="interaction-buttons">
-                                <span><img src="./icons/hearth.svg" alt="j'aime" class="icons"></span>
-                                <span><img src="./icons/comment.svg" alt="commenter" class="icons"></span>
-                                <span><img src="./icons/share.svg" alt="partage" class="icons"></span>
-                            </div>
-                            <div class="bookmark">
-                                <span><img src="./icons/favorie.svg" alt="favorie" class="icons"></span>
-                            </div>
-                        </div>
-            
-                        <div class="liked-by">
-                            <span><img src="./img/profile-photo2-medium.jpg" alt="j'ame" class="icons"></span>
-                            <span><img src="./img/profil-person2-large.jpg" alt="j'ame" class="icons"></span>
-                            <span><img src="./img/profile-photo3-large.jpg" alt="j'ame" class="icons"></span>
-                            <p>Aimé par <b>Georges</b>, <b>Bavon</b>, <b>Ruth</b> et 366 autres personnes</p>
-                        </div>
-            
-                        <div class="caption">
-                            <b>Bavon Kalolo </b> Lorem ipsum, dolor sit amet consectetur adipisicing elit. Obcaecati, alias illum enim aliquam
-                            <span class="harsh-tag">#lifestyle</span>
-                        </div>
-            
-                        <div class="text-muted comments">
-                            Voir Tout les 402 commentaires
-                        </div>
-                    </div>
-                    <!------------END OF FEED------------>
-                </div>
-                <!------------END OF FEEDS------------>
-            
+            <div class="gallery" data-count="1">
+              <img class="gallery__item" src="assets/images/posts/hackathon.webp" alt="Des étudiantes et étudiants concentrés, en train de coder sur leurs ordinateurs portables" width="1200" height="675" loading="lazy" decoding="async">
             </div>
-            <!---------------------------------END OF MIDDLE---------------------------------->
-            
-            <!------------RIGTH------------>
-            <div class="right">
-                <div class="messages">
-                    <div class="heading">
-                        <h4>Messages</h4><span><img src="./icons/agenda.svg" alt="éditer" class="icons"></span>
-                    </div>
-                    
-                    <!------------SEARCH-BAR------------>
-                    <div class="search-bar">
-                        <img src="./icons/search.svg" alt="chercher" class="icons">
-                        <input type="search" placeholder="Chercher un message" id="message-search">
-                    </div>
 
-                    <!------------MESSAGES CATEGORY------------>
-                    <div class="category">
-                        <h6 class="active">Primary</h6>
-                        <h6>General</h6>
-                        <h6 class="messages-requests">Requests(3)</h6>
-                    </div>
-
-                    <!------------MESSAGES---------->
-                    <div class="message">
-                        <div class="profile-picture">
-                            <img src="./img/profile-photo2-large.jpg" alt="photo de profil">
-                            <div class="active"></div>
-                        </div>
-                        <div class="message-body">
-                            <h5>Edem Quist</h5>
-                            <p class="text-muted">Just Woke up bruh</p>
-                        </div>
-                    </div>
-                    <div class="message">
-                        <div class="profile-picture">
-                            <img src="./img/profile-photo3-large.jpg" alt="photo de profil">
-                        </div>
-                        <div class="message-body">
-                            <h5>Réné Loma</h5>
-                            <p class="text-muted">Just Woke up bruh</p>
-                        </div>
-                    </div>
-                    <div class="message">
-                        <div class="profile-picture">
-                            <img src="./img/profil-person2-large.jpg" alt="photo de profil">
-                            <div class="active"></div>
-                        </div>
-                        <div class="message-body">
-                            <h5>Edem Quist</h5>
-                            <p>Salut, tu étais à esis aujourd'hui ? ervrve ve rvetrvt vevrtt</p>
-                        </div>
-                    </div>
-                    <div class="message">
-                        <div class="profile-picture">
-                            <img src="./img/profile-photo2-large.jpg" alt="photo de profil">
-                        </div>
-                        <div class="message-body">
-                            <h5>Edem Quist</h5>
-                            <p>2 nouveaux mesages</p>
-                        </div>
-                    </div>
-                    <!------------END OF MESSAGES---------->
+            <footer class="post__footer">
+              <p class="post__stat">
+                <svg class="icon" aria-hidden="true"><use href="#icon-eye"></use></svg>
+                12 940<span class="visually-hidden"> vues</span>
+              </p>
+              <button class="post__action post__like" type="button" aria-pressed="true" data-action="like">
+                <svg class="icon" aria-hidden="true"><use href="#icon-heart"></use></svg>J'aime
+              </button>
+              <a class="post__action" href="#post-3-comments">
+                <svg class="icon" aria-hidden="true"><use href="#icon-chat"></use></svg>Commenter
+              </a>
+              <div class="reaction">
+                <button class="reaction__trigger" type="button" popovertarget="post-3-reactions">
+                  <span class="visually-hidden">Votre réaction : </span>
+                  <span class="reaction__emoji" aria-hidden="true">🙂</span>
+                  <span class="reaction__label">Réagir</span>
+                </button>
+                <div class="emoji-picker reaction__picker" id="post-3-reactions" popover>
+                  <button class="emoji-picker__option" type="button" data-action="react" data-emoji="🔥" aria-label="Wouah !">🔥</button>
+                  <button class="emoji-picker__option" type="button" data-action="react" data-emoji="😍" aria-label="J'adore">😍</button>
+                  <button class="emoji-picker__option" type="button" data-action="react" data-emoji="😂" aria-label="Trop drôle">😂</button>
+                  <button class="emoji-picker__option" type="button" data-action="react" data-emoji="😮" aria-label="Impressionnant">😮</button>
+                  <button class="emoji-picker__option" type="button" data-action="react" data-emoji="👏" aria-label="Bravo">👏</button>
+                  <button class="emoji-picker__close" type="button" popovertarget="post-3-reactions" popovertargetaction="hide" aria-label="Fermer">
+                    <svg class="icon" aria-hidden="true"><use href="#icon-x"></use></svg>
+                  </button>
                 </div>
+              </div>
+            </footer>
+          </article>
 
-                <!------------FRIEND REQUESTS------------>
-                <div class="friend-requests">
-                    <h4>Requests</h4>
-                    <div class="request">
-                        <div class="info">
-                            <div class="profile-picture">
-                                <img src="./img/profile-photo3-large.jpg" alt="photo de profil">
-                            </div>
-                            <div>
-                                <h5>Kadidja Conde</h5>
-                                <p class="text-muted">6 amis en commun</p>
-                            </div>
-                        </div>
-                        <div class="action">
-                            <buttton class="btn btn-primary">Accepter</buttton>
-                            <buttton class="btn">Refuser</buttton>
-                        </div>
-                    </div>
+          <!-- ---------- Publication : sondage 100 % CSS ---------- -->
+          <article class="post" id="post-4" data-tone="lilac" data-friend aria-labelledby="post-4-author">
+            <header class="post__header">
+              <img class="avatar" src="assets/images/avatars/merveille-tshibanda.webp" alt="" width="160" height="160">
+              <div class="post__byline">
+                <h3 class="post__author" id="post-4-author"><a href="#merveille-tshibanda">Merveille Tshibanda</a></h3>
+                <p class="post__meta"><time datetime="2026-11-13T19:40">hier à 19 h 40</time></p>
+              </div>
+              <button class="icon-button post__more" type="button" popovertarget="post-4-menu" aria-label="Options de la publication">
+                <svg class="icon" aria-hidden="true"><use href="#icon-dots-vertical"></use></svg>
+              </button>
+              <div class="menu" id="post-4-menu" popover>
+                <ul class="menu__list" role="list">
+                  <li>
+                    <button class="menu__item" type="button" data-action="save">
+                      <svg class="icon" aria-hidden="true"><use href="#icon-bookmark"></use></svg>Enregistrer
+                    </button>
+                  </li>
+                  <li>
+                    <button class="menu__item" type="button" data-action="copy-link">
+                      <svg class="icon" aria-hidden="true"><use href="#icon-link"></use></svg>Copier le lien
+                    </button>
+                  </li>
+                  <li>
+                    <button class="menu__item menu__item--danger" type="button" data-action="report">
+                      <svg class="icon" aria-hidden="true"><use href="#icon-flag"></use></svg>Signaler
+                    </button>
+                  </li>
+                </ul>
+              </div>
+            </header>
 
-                    <div class="request">
-                        <div class="info">
-                            <div class="profile-picture">
-                                <img src="./img/profile-photo2-medium.jpg" alt="photo de profil">
-                            </div>
-                            <div>
-                                <h5>Tshikwetu Muvuma</h5>
-                                <p class="text-muted">6 amis en commun</p>
-                            </div>
-                        </div>
-                        <div class="action">
-                            <buttton class="btn btn-primary">Accepter</buttton>
-                            <buttton class="btn">Refuser</buttton>
-                        </div>
-                    </div>
-                    
+            <p class="post__text">Révisions pour l'examen d'algorithmique : on se retrouve où ? 📚</p>
+
+            <!-- Les résultats apparaissent dès qu'une option est cochée (:has(:checked)). -->
+            <fieldset class="poll">
+              <legend class="visually-hidden">Sondage : lieu des révisions</legend>
+              <label class="poll__option" style="--votes: 64%">
+                <input class="poll__input" type="radio" name="poll-revisions" value="library">
+                <span class="poll__label">À la bibliothèque</span>
+                <span class="poll__result">64 %</span>
+              </label>
+              <label class="poll__option" style="--votes: 27%">
+                <input class="poll__input" type="radio" name="poll-revisions" value="online">
+                <span class="poll__label">En ligne, en visio</span>
+                <span class="poll__result">27 %</span>
+              </label>
+              <label class="poll__option" style="--votes: 9%">
+                <input class="poll__input" type="radio" name="poll-revisions" value="home">
+                <span class="poll__label">Chacun chez soi</span>
+                <span class="poll__result">9 %</span>
+              </label>
+              <p class="poll__total">142 votes · se termine dans 2 jours</p>
+            </fieldset>
+
+            <footer class="post__footer">
+              <p class="post__stat">
+                <svg class="icon" aria-hidden="true"><use href="#icon-eye"></use></svg>
+                1 087<span class="visually-hidden"> vues</span>
+              </p>
+              <button class="post__action post__like" type="button" aria-pressed="false" data-action="like">
+                <svg class="icon" aria-hidden="true"><use href="#icon-heart"></use></svg>J'aime
+              </button>
+              <a class="post__action" href="#post-4-comments">
+                <svg class="icon" aria-hidden="true"><use href="#icon-chat"></use></svg>Commenter
+              </a>
+              <div class="reaction">
+                <button class="reaction__trigger" type="button" popovertarget="post-4-reactions">
+                  <span class="visually-hidden">Votre réaction : </span>
+                  <span class="reaction__emoji" aria-hidden="true">🙂</span>
+                  <span class="reaction__label">Réagir</span>
+                </button>
+                <div class="emoji-picker reaction__picker" id="post-4-reactions" popover>
+                  <button class="emoji-picker__option" type="button" data-action="react" data-emoji="🔥" aria-label="Wouah !">🔥</button>
+                  <button class="emoji-picker__option" type="button" data-action="react" data-emoji="😍" aria-label="J'adore">😍</button>
+                  <button class="emoji-picker__option" type="button" data-action="react" data-emoji="😂" aria-label="Trop drôle">😂</button>
+                  <button class="emoji-picker__option" type="button" data-action="react" data-emoji="😮" aria-label="Impressionnant">😮</button>
+                  <button class="emoji-picker__option" type="button" data-action="react" data-emoji="👏" aria-label="Bravo">👏</button>
+                  <button class="emoji-picker__close" type="button" popovertarget="post-4-reactions" popovertargetaction="hide" aria-label="Fermer">
+                    <svg class="icon" aria-hidden="true"><use href="#icon-x"></use></svg>
+                  </button>
                 </div>
-            </div>
+              </div>
+            </footer>
+          </article>
         </div>
-    </main>
 
-</body>
+        <!-- ---------- Compositeur (collé en bas de l'écran) ---------- -->
+        <form class="composer" action="#feed" aria-label="Créer une publication">
+          <div class="composer__field">
+            <img class="avatar avatar--sm" src="assets/images/avatars/ben-uzan.webp" alt="" width="160" height="160">
+            <label class="visually-hidden" for="composer-message">Votre message</label>
+            <textarea
+              class="composer__input"
+              id="composer-message"
+              name="message"
+              rows="1"
+              maxlength="500"
+              placeholder="Partage quelque chose…"
+              required
+            ></textarea>
+            <button class="icon-button composer__emoji" type="button" popovertarget="composer-emojis" aria-label="Insérer un emoji">
+              <svg class="icon" aria-hidden="true"><use href="#icon-smiley"></use></svg>
+            </button>
+            <div class="emoji-picker composer__emojis" id="composer-emojis" popover>
+              <button class="emoji-picker__option" type="button" data-action="insert-emoji" aria-label="Sourire">😊</button>
+              <button class="emoji-picker__option" type="button" data-action="insert-emoji" aria-label="Rire">😂</button>
+              <button class="emoji-picker__option" type="button" data-action="insert-emoji" aria-label="Fête">🎉</button>
+              <button class="emoji-picker__option" type="button" data-action="insert-emoji" aria-label="Feu">🔥</button>
+              <button class="emoji-picker__option" type="button" data-action="insert-emoji" aria-label="Livres">📚</button>
+              <button class="emoji-picker__option" type="button" data-action="insert-emoji" aria-label="Café">☕</button>
+            </div>
+          </div>
+
+          <!-- Aperçu des pièces jointes et du lieu (rempli par app.js) -->
+          <ul class="composer__attachments" role="list" hidden></ul>
+
+          <div class="composer__toolbar">
+            <label class="composer__tool">
+              <input class="visually-hidden" type="file" name="file" data-kind="file">
+              <svg class="icon" aria-hidden="true"><use href="#icon-file"></use></svg><span class="composer__tool-label">Fichier</span>
+            </label>
+            <label class="composer__tool">
+              <input class="visually-hidden" type="file" name="image" accept="image/*" data-kind="image">
+              <svg class="icon" aria-hidden="true"><use href="#icon-image"></use></svg><span class="composer__tool-label">Image</span>
+            </label>
+            <button class="composer__tool" type="button" aria-pressed="false" data-action="toggle-location">
+              <svg class="icon" aria-hidden="true"><use href="#icon-map-pin"></use></svg><span class="composer__tool-label">Lieu</span>
+            </button>
+            <div class="composer__tool composer__audience">
+              <svg class="icon" aria-hidden="true"><use href="#icon-globe"></use></svg>
+              <label class="visually-hidden" for="composer-audience">Visibilité</label>
+              <select class="composer__select" id="composer-audience" name="audience">
+                <option value="public" selected>Public</option>
+                <option value="friends">Amis</option>
+                <option value="promo">Ma promo</option>
+                <option value="private">Moi uniquement</option>
+              </select>
+              <svg class="icon composer__caret" aria-hidden="true"><use href="#icon-caret-down"></use></svg>
+            </div>
+            <button class="button button--primary composer__submit" type="submit">
+              <span class="composer__submit-label">Envoyer</span>
+              <svg class="icon" aria-hidden="true"><use href="#icon-paper-plane"></use></svg>
+            </button>
+          </div>
+        </form>
+      </main>
+
+      <!-- ============ Colonne de droite : découvrir ============ -->
+      <aside class="aside" aria-label="Découvrir">
+        <section class="stories" aria-labelledby="stories-title">
+          <h2 class="section-title" id="stories-title">Stories</h2>
+          <ul class="stories__list" role="list">
+            <li class="story">
+              <a class="story__link" href="#story-anatole">
+                <img class="story__image" src="assets/images/stories/desert-dunes.webp" alt="" width="540" height="810" loading="lazy" decoding="async">
+                <span class="story__author">
+                  <img class="avatar avatar--xs" src="assets/images/avatars/anatole-prince.webp" alt="" width="160" height="160">
+                  <span class="story__name"><span class="visually-hidden">Voir la story d'</span>Anatole Prince</span>
+                </span>
+              </a>
+            </li>
+            <li class="story">
+              <a class="story__link" href="#story-lolita">
+                <img class="story__image" src="assets/images/stories/sunset-mountains.webp" alt="" width="540" height="810" loading="lazy" decoding="async">
+                <span class="story__author">
+                  <img class="avatar avatar--xs" src="assets/images/avatars/lolita-kabeya.webp" alt="" width="160" height="160">
+                  <span class="story__name"><span class="visually-hidden">Voir la story de </span>Lolita Kabeya</span>
+                </span>
+              </a>
+            </li>
+            <li class="story">
+              <a class="story__link" href="#story-chris">
+                <img class="story__image" src="assets/images/stories/concert-night.webp" alt="" width="540" height="810" loading="lazy" decoding="async">
+                <span class="story__author">
+                  <img class="avatar avatar--xs" src="assets/images/avatars/chris-ilunga.webp" alt="" width="160" height="160">
+                  <span class="story__name"><span class="visually-hidden">Voir la story de </span>Chris Ilunga</span>
+                </span>
+              </a>
+            </li>
+            <li class="story">
+              <a class="story__link" href="#story-naomi">
+                <img class="story__image" src="assets/images/stories/graduation.webp" alt="" width="540" height="810" loading="lazy" decoding="async">
+                <span class="story__author">
+                  <img class="avatar avatar--xs" src="assets/images/avatars/naomi-tshala.webp" alt="" width="160" height="160">
+                  <span class="story__name"><span class="visually-hidden">Voir la story de </span>Naomi Tshala</span>
+                </span>
+              </a>
+            </li>
+          </ul>
+        </section>
+
+        <section class="suggestions" aria-labelledby="suggestions-title">
+          <h2 class="section-title" id="suggestions-title">Suggestions</h2>
+          <ul class="suggestions__list" role="list">
+            <li class="suggestion">
+              <img class="avatar avatar--md suggestion__avatar" data-tone="rose" src="assets/images/avatars/nicolas-shabani.webp" alt="" width="160" height="160">
+              <p class="suggestion__body">
+                <span class="suggestion__name">Nicolas Shabani</span>
+                <span class="suggestion__info">L3 Réseaux</span>
+              </p>
+              <button class="button button--small suggestion__follow" type="button" data-action="follow">
+                <svg class="icon" aria-hidden="true"><use href="#icon-check"></use></svg>
+                <span class="suggestion__follow-label">Suivre</span><span class="visually-hidden"> Nicolas Shabani</span>
+              </button>
+            </li>
+            <li class="suggestion">
+              <img class="avatar avatar--md suggestion__avatar" data-tone="sun" src="assets/images/avatars/brigitte-lando.webp" alt="" width="160" height="160">
+              <p class="suggestion__body">
+                <span class="suggestion__name">Brigitte Lando</span>
+                <span class="suggestion__info">L2 Génie logiciel</span>
+              </p>
+              <button class="button button--small suggestion__follow" type="button" data-action="follow">
+                <svg class="icon" aria-hidden="true"><use href="#icon-check"></use></svg>
+                <span class="suggestion__follow-label">Suivre</span><span class="visually-hidden"> Brigitte Lando</span>
+              </button>
+            </li>
+            <li class="suggestion">
+              <img class="avatar avatar--md suggestion__avatar" data-tone="azure" src="assets/images/avatars/ivan-chenko.webp" alt="" width="160" height="160">
+              <p class="suggestion__body">
+                <span class="suggestion__name">Ivan Chenko</span>
+                <span class="suggestion__info">Master IA</span>
+              </p>
+              <button class="button button--small suggestion__follow" type="button" data-action="follow">
+                <svg class="icon" aria-hidden="true"><use href="#icon-check"></use></svg>
+                <span class="suggestion__follow-label">Suivre</span><span class="visually-hidden"> Ivan Chenko</span>
+              </button>
+            </li>
+          </ul>
+          <a class="suggestions__more" href="#suggestions">Voir tout</a>
+        </section>
+
+        <section class="topics" aria-labelledby="topics-title">
+          <h2 class="section-title" id="topics-title">Recommandations</h2>
+          <ul class="topics__list" role="list">
+            <li>
+              <a class="topic topic--design" href="#ui-ux">
+                <svg class="icon" aria-hidden="true"><use href="#icon-pen-nib"></use></svg>
+                <span class="topic__label">UI/UX</span>
+              </a>
+            </li>
+            <li>
+              <a class="topic topic--music" href="#musique">
+                <svg class="icon" aria-hidden="true"><use href="#icon-music-notes"></use></svg>
+                <span class="topic__label">Musique</span>
+              </a>
+            </li>
+            <li>
+              <a class="topic topic--cooking" href="#cuisine">
+                <img class="topic__image" src="assets/images/topics/cooking.webp" alt="" width="320" height="320" loading="lazy" decoding="async">
+                <span class="topic__label">Cuisine</span>
+              </a>
+            </li>
+            <li>
+              <a class="topic topic--hiking" href="#randonnee">
+                <svg class="icon" aria-hidden="true"><use href="#icon-mountains"></use></svg>
+                <span class="topic__label">Randonnée</span>
+              </a>
+            </li>
+          </ul>
+        </section>
+      </aside>
+    </div>
+
+    <!-- Messages éphémères, visibles et lus par les lecteurs d'écran (rempli par app.js) -->
+    <p class="toast" role="status"></p>
+
+    <!-- Modèle d'une nouvelle publication, cloné par app.js à l'envoi du compositeur -->
+    <template id="post-template">
+      <article class="post" data-friend data-new>
+        <header class="post__header">
+          <img class="avatar" src="assets/images/avatars/ben-uzan.webp" alt="" width="160" height="160">
+          <div class="post__byline">
+            <h3 class="post__author"><a href="#profil">Ben Uzan</a></h3>
+            <p class="post__meta">
+              <time>à l'instant</time>
+              <span class="post__place" hidden>
+                · <svg class="icon" aria-hidden="true"><use href="#icon-map-pin"></use></svg>Campus ESIS, Lubumbashi
+              </span>
+              <span class="post__audience"></span>
+            </p>
+          </div>
+        </header>
+        <p class="post__text"></p>
+        <div class="gallery" data-count="1" hidden>
+          <img class="gallery__item" src="assets/images/brand/favicon.svg" alt="" width="1200" height="675">
+        </div>
+        <p class="post__file" hidden>
+          <svg class="icon" aria-hidden="true"><use href="#icon-file"></use></svg><span></span>
+        </p>
+        <footer class="post__footer">
+          <p class="post__stat">
+            <svg class="icon" aria-hidden="true"><use href="#icon-eye"></use></svg>
+            0<span class="visually-hidden"> vue</span>
+          </p>
+          <button class="post__action post__like" type="button" aria-pressed="false" data-action="like">
+            <svg class="icon" aria-hidden="true"><use href="#icon-heart"></use></svg>J'aime
+          </button>
+          <a class="post__action" href="#feed">
+            <svg class="icon" aria-hidden="true"><use href="#icon-chat"></use></svg>Commenter
+          </a>
+        </footer>
+      </article>
+    </template>
+  </body>
 </html>
