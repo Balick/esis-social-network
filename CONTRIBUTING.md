@@ -54,20 +54,24 @@ Types courants : `feat`, `fix`, `docs`, `style`, `refactor`, `perf`, `chore`, `c
 
 ### Blocs partagés (`partials/`)
 
-Le `<head>`, le menu latéral, le lien d'évitement, le toast et le sprite d'icônes sont identiques
+Le `<head>`, l'en-tête (`topbar` : logo, recherche, menus, notifications, compte), la colonne de
+gauche (`sidebar` : profil, raccourcis), le lien d'évitement, le toast et le sprite d'icônes sont identiques
 sur toutes les pages. Ils sont écrits **une seule fois** dans `partials/` puis recopiés dans chaque
 page, entre deux marqueurs :
 
 ```html
-<!-- partial:sidebar -->
+<!-- partial:topbar -->
 …contenu généré, ne pas modifier ici…
-<!-- /partial:sidebar -->
+<!-- /partial:topbar -->
 ```
 
 - Modifiez le fichier de `partials/` (ou une icône de `assets/icons/`), puis lancez
   **`npm run sync`** : toutes les pages sont mises à jour. Commitez le résultat.
-- Le lien actif du menu est déduit de `<body data-page="…">` (valeurs : `fil`, `profil`,
-  `messages`, `forums`, `amis`, `agenda`, `parametres`) : le script y ajoute `aria-current="page"`.
+- Le lien actif est déduit de `<body data-page="…">` (valeurs : `fil`, `profil`, `messages`,
+  `forums`, `amis`, `agenda`, `parametres`, `composants`) : dans l'en-tête et la colonne de
+  gauche, le script ajoute `aria-current="page"` aux liens dont le `data-nav` correspond.
+- Un élément « collant » (`position: sticky`) doit tenir compte de l'en-tête :
+  `inset-block-start: var(--sticky-offset)` (hauteur de l'en-tête, nulle sur mobile).
 - La CI vérifie que les pages sont à jour (`npm run lint:sync`).
 - Pourquoi pas un `fetch` ou des Web Components ? Pour que le site fonctionne en ouvrant les
   fichiers directement depuis le disque (`file://`), sans serveur.
@@ -199,10 +203,10 @@ Une icône seule dans un bouton ou un lien est décorative : donnez au bouton un
 2. Gardez les marqueurs `<!-- partial:… -->` tels quels (même vides) et lancez `npm run sync`.
 3. Gardez un seul `<h1>` (dans `<header class="page-header">`) et un `<main id="main" tabindex="-1">`,
    cible du lien d'évitement.
-4. Sans colonne de droite (`<aside class="aside">`), la mise en page passe toute seule à deux
-   colonnes.
-5. Pour l'ajouter au menu, modifiez `partials/sidebar.html` (avec un `data-nav` unique), puis
-   `npm run sync`.
+4. Sans colonne de droite (`<aside class="aside">`), la colonne de gauche et le contenu se
+   partagent la largeur ; avec elle, la colonne de gauche n'apparaît qu'à partir de 80rem.
+5. Pour l'ajouter aux menus, modifiez `partials/topbar.html` (ou les raccourcis de
+   `partials/sidebar.html`) avec un `data-nav` unique, puis `npm run sync`.
 
 ## Lint
 

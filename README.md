@@ -19,7 +19,7 @@ sans framework ni étape de build.
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="docs/screenshot-dark.webp">
-  <img src="docs/screenshot-light.webp" alt="Interface de Post it : menu latéral, fil d'actualité avec publications colorées, stories, suggestions et recommandations">
+  <img src="docs/screenshot-light.webp" alt="Interface de Post it : en-tête avec logo, recherche et menus, colonne de profil et raccourcis, fil d'actualité avec publications colorées, stories, suggestions et recommandations">
 </picture>
 
 **Post it** est un template complet d'interface de réseau social — fil d'actualité, profil,
@@ -97,7 +97,7 @@ npm run dev      # serveur local (équivaut à npx serve .)
 
 ```text
 *.html                  une page par écran (index, profil, messages, forums, amis, agenda…)
-partials/               blocs partagés : <head>, menu latéral, logo, lien d'évitement, toast
+partials/               blocs partagés : <head>, en-tête, colonne de gauche, logo, toast…
 scripts/
   sync-partials.mjs     recopie les blocs partagés et le sprite d'icônes dans chaque page
 assets/
@@ -108,7 +108,7 @@ assets/
     layout.css          grille de l'application + responsive
     components/         un fichier par composant (@layer components)
                         partagés : button avatar tag card section-title page-header forms
-                        tabs dialog popover sidebar toast
+                        tabs dialog popover topbar sidebar toast
                         propres à une page : feed post composer chat forum calendar…
     utilities.css       .visually-hidden, data-tone, etc.
   js/
