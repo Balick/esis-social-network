@@ -2,7 +2,7 @@
  * Synchronise les blocs HTML partagés entre toutes les pages du site.
  *
  * Le site reste du HTML statique (aucune étape de build pour le voir) : ce script
- * sert seulement à ne pas recopier à la main la barre latérale ou les icônes
+ * sert seulement à ne pas recopier à la main l'en-tête, les menus ou les icônes
  * dans chaque page. Chaque page contient des marqueurs :
  *
  *   <!-- partial:sidebar -->
@@ -13,8 +13,10 @@
  *   head       partials/head.html : métas, styles et scripts communs
  *   skip-link  partials/skip-link.html : lien d'évitement
  *   sprite     généré : logo (partials/logo.html) + une icône par fichier assets/icons/*.svg
- *   sidebar    partials/sidebar.html : le lien dont data-nav vaut le data-page
- *              de <body> reçoit aria-current="page"
+ *   topbar     partials/topbar.html : en-tête (logo, recherche, menus, compte)
+ *   sidebar    partials/sidebar.html : colonne de gauche (profil, raccourcis)
+ *              Dans ces deux blocs, les liens dont data-nav vaut le data-page
+ *              de <body> reçoivent aria-current="page".
  *   toast      partials/toast.html : zone des messages éphémères
  *
  * Utilisation :
@@ -68,15 +70,19 @@ function sprite() {
   return spriteCache
 }
 
+// Lien de la page courante : data-nav="messages" + <body data-page="messages"> → aria-current
+const markCurrent = (html, page) =>
+  html.replace(/ data-nav="([^"]+)"/g, (match, nav) =>
+    nav === page ? `${match} aria-current="page"` : match,
+  )
+
 const partials = {
   head: () => read('partials/head.html'),
   'skip-link': () => read('partials/skip-link.html'),
   sprite,
   toast: () => read('partials/toast.html'),
-  sidebar: (page) =>
-    read('partials/sidebar.html').replace(/ data-nav="([^"]+)"/g, (match, nav) =>
-      nav === page ? `${match} aria-current="page"` : match,
-    ),
+  topbar: (page) => markCurrent(read('partials/topbar.html'), page),
+  sidebar: (page) => markCurrent(read('partials/sidebar.html'), page),
 }
 
 const indent = (text, prefix) =>

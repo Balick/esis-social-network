@@ -29,6 +29,7 @@
     <link rel="stylesheet" href="assets/css/components/tabs.css">
     <link rel="stylesheet" href="assets/css/components/dialog.css">
     <link rel="stylesheet" href="assets/css/components/popover.css">
+    <link rel="stylesheet" href="assets/css/components/topbar.css">
     <link rel="stylesheet" href="assets/css/components/sidebar.css">
     <link rel="stylesheet" href="assets/css/components/toast.css">
     <link rel="stylesheet" href="assets/css/utilities.css">
@@ -184,25 +185,36 @@
     </svg>
     <!-- /partial:sprite -->
 
-    <div class="app">
-      <!-- partial:sidebar -->
-      <!-- ============ Colonne de gauche : profil + navigation ============ -->
-      <header class="sidebar">
-        <a class="profile" href="profil.html" data-nav="profil">
-          <span class="profile__media">
-            <svg class="profile__logo" aria-hidden="true"><use href="#logo"></use></svg>
-            <img class="profile__avatar avatar" src="assets/images/avatars/ben-uzan.webp" alt="" width="160" height="160">
-          </span>
-          <span class="profile__name">Ben Uzan</span>
-          <span class="profile__handle"><span class="visually-hidden">, </span>@buzan</span>
-        </a>
+    <!-- partial:topbar -->
+    <!-- ============ En-tête : logo, recherche, navigation principale, compte ============ -->
+    <header class="topbar">
+      <div class="topbar__inner">
+        <div class="topbar__start">
+          <a class="topbar__brand" href="index.html">
+            <svg class="topbar__logo" aria-hidden="true"><use href="#logo"></use></svg>
+            <span class="topbar__name">Post it</span>
+          </a>
+
+          <search class="topbar__search">
+            <form action="#recherche" data-search>
+              <label class="visually-hidden" for="topbar-search">Rechercher sur Post it</label>
+              <div class="input-group">
+                <svg class="icon" aria-hidden="true"><use href="#icon-magnifying-glass"></use></svg>
+                <input class="input input--pill" id="topbar-search" type="search" name="q" placeholder="Rechercher…" autocomplete="off">
+                <button class="icon-button topbar__submit" type="submit" aria-label="Lancer la recherche">
+                  <svg class="icon" aria-hidden="true"><use href="#icon-arrow-right"></use></svg>
+                </button>
+              </div>
+            </form>
+          </search>
+        </div>
 
         <nav class="nav" aria-label="Navigation principale">
           <ul class="nav__list" role="list">
             <li>
               <a class="nav__link" href="index.html" data-nav="fil">
-                <svg class="icon" aria-hidden="true"><use href="#icon-compass"></use></svg>
-                <span class="nav__label">Fil d'actualité</span>
+                <svg class="icon" aria-hidden="true"><use href="#icon-house"></use></svg>
+                <span class="nav__label">Accueil</span>
               </a>
             </li>
             <li>
@@ -231,21 +243,157 @@
                 <span class="nav__label">Agenda</span>
               </a>
             </li>
+          </ul>
+        </nav>
+
+        <div class="topbar__actions">
+          <!-- Notifications : panneau en popover, placé sous le bouton -->
+          <button class="icon-button topbar__button" type="button" popovertarget="notifications-panel" aria-label="Notifications, 3 non lues">
+            <svg class="icon" aria-hidden="true"><use href="#icon-bell"></use></svg>
+            <span class="badge topbar__badge" aria-hidden="true">3</span>
+          </button>
+          <div class="menu notifications" id="notifications-panel" popover>
+            <div class="notifications__header">
+              <p class="notifications__title">Notifications</p>
+              <button class="notifications__read" type="button" data-action="mark-all-read">Tout marquer comme lu</button>
+            </div>
+            <ul class="notifications__list" role="list">
+              <li>
+                <a class="notifications__item" href="profil.html#profile-post-1" data-unread>
+                  <img class="avatar avatar--sm" src="assets/images/avatars/grace-mwamba.webp" alt="" width="160" height="160">
+                  <span class="notifications__text">
+                    <span class="notifications__unread visually-hidden">Non lue : </span>
+                    <strong>Grâce Mwamba</strong> a aimé votre publication sur le hackathon.
+                    <time class="notifications__time" datetime="2026-11-14T14:25">il y a 5 min</time>
+                  </span>
+                </a>
+              </li>
+              <li>
+                <a class="notifications__item" href="profil.html#profile-post-1" data-unread>
+                  <img class="avatar avatar--sm" src="assets/images/avatars/jeremie-matabaro.webp" alt="" width="160" height="160">
+                  <span class="notifications__text">
+                    <span class="notifications__unread visually-hidden">Non lue : </span>
+                    <strong>Jérémie Matabaro</strong> a commenté : « Bravo à toute l'équipe ! »
+                    <time class="notifications__time" datetime="2026-11-14T14:10">il y a 20 min</time>
+                  </span>
+                </a>
+              </li>
+              <li>
+                <a class="notifications__item" href="amis.html" data-unread>
+                  <img class="avatar avatar--sm" src="assets/images/avatars/lolita-kabeya.webp" alt="" width="160" height="160">
+                  <span class="notifications__text">
+                    <span class="notifications__unread visually-hidden">Non lue : </span>
+                    <strong>Lolita Kabeya</strong> vous a envoyé une demande d'ami.
+                    <time class="notifications__time" datetime="2026-11-14T12:30">il y a 2 h</time>
+                  </span>
+                </a>
+              </li>
+              <li>
+                <a class="notifications__item" href="agenda.html">
+                  <span class="avatar avatar--sm avatar--initials" data-tone="violet" aria-hidden="true">CD</span>
+                  <span class="notifications__text">
+                    <strong>Club Dev</strong> a publié un événement : Hackathon « Villes durables ».
+                    <time class="notifications__time" datetime="2026-11-13T18:00">hier</time>
+                  </span>
+                </a>
+              </li>
+            </ul>
+            <a class="notifications__all" href="#toutes-les-notifications">Voir toutes les notifications</a>
+          </div>
+
+          <!-- Affiché par app.js : sans JavaScript, le thème suit simplement le système. -->
+          <button class="theme-switch" type="button" role="switch" aria-checked="false" hidden>
+            <svg class="icon" aria-hidden="true"><use href="#icon-moon"></use></svg>
+            <span class="visually-hidden">Mode sombre</span>
+          </button>
+
+          <!-- Menu du compte -->
+          <button class="topbar__account" type="button" popovertarget="account-menu" aria-label="Votre compte">
+            <img class="topbar__avatar avatar" src="assets/images/avatars/ben-uzan.webp" alt="" width="160" height="160" data-me="avatar">
+            <svg class="icon" aria-hidden="true"><use href="#icon-caret-down"></use></svg>
+          </button>
+          <div class="menu topbar__menu" id="account-menu" popover>
+            <a class="topbar__me" href="profil.html">
+              <img class="avatar avatar--md" src="assets/images/avatars/ben-uzan.webp" alt="" width="160" height="160" data-me="avatar">
+              <span class="topbar__me-text">
+                <span class="topbar__me-name" data-me="name">Ben Uzan</span>
+                <span class="topbar__me-handle">@buzan</span>
+              </span>
+            </a>
+            <ul class="menu__list" role="list">
+              <li>
+                <a class="menu__item" href="profil.html" data-nav="profil">
+                  <svg class="icon" aria-hidden="true"><use href="#icon-user"></use></svg>Mon profil
+                </a>
+              </li>
+              <li>
+                <a class="menu__item" href="parametres.html" data-nav="parametres">
+                  <svg class="icon" aria-hidden="true"><use href="#icon-gear"></use></svg>Paramètres
+                </a>
+              </li>
+              <li>
+                <a class="menu__item" href="composants.html" data-nav="composants">
+                  <svg class="icon" aria-hidden="true"><use href="#icon-palette"></use></svg>Kit d'interface
+                </a>
+              </li>
+              <li>
+                <a class="menu__item" href="connexion.html">
+                  <svg class="icon" aria-hidden="true"><use href="#icon-sign-out"></use></svg>Se déconnecter
+                </a>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </header>
+    <!-- /partial:topbar -->
+
+    <div class="app">
+      <!-- partial:sidebar -->
+      <!-- ============ Colonne de gauche : profil et raccourcis (grand écran) ============ -->
+      <aside class="sidebar" aria-label="Votre espace">
+        <a class="profile" href="profil.html" data-nav="profil">
+          <span class="profile__cover" aria-hidden="true"></span>
+          <img class="profile__avatar avatar" src="assets/images/avatars/ben-uzan.webp" alt="" width="160" height="160" data-me="avatar">
+          <span class="profile__name" data-me="name">Ben Uzan</span>
+          <span class="profile__handle"><span class="visually-hidden">, </span>@buzan</span>
+          <span class="profile__stats">
+            <span><strong>128</strong> publications</span>
+            <span><strong>1 254</strong> abonnés</span>
+          </span>
+        </a>
+
+        <nav class="shortcuts" aria-labelledby="shortcuts-title">
+          <p class="shortcuts__title" id="shortcuts-title">Raccourcis</p>
+          <ul class="shortcuts__list" role="list">
             <li>
-              <a class="nav__link" href="parametres.html" data-nav="parametres">
-                <svg class="icon" aria-hidden="true"><use href="#icon-gear"></use></svg>
-                <span class="nav__label">Paramètres</span>
+              <a class="shortcuts__link" href="#groupe-club-dev">
+                <span class="shortcuts__icon" data-tone="lilac" aria-hidden="true">CD</span>Club Dev
+              </a>
+            </li>
+            <li>
+              <a class="shortcuts__link" href="agenda.html">
+                <span class="shortcuts__icon" data-tone="sky"><svg class="icon" aria-hidden="true"><use href="#icon-calendar-check"></use></svg></span>Mes événements
+                <span class="shortcuts__count"><span class="visually-hidden">, </span>3<span class="visually-hidden"> à venir</span></span>
+              </a>
+            </li>
+            <li>
+              <a class="shortcuts__link" href="forums.html#categorie-randonnee">
+                <span class="shortcuts__icon" data-tone="mint"><svg class="icon" aria-hidden="true"><use href="#icon-mountains"></use></svg></span>Randonnée &amp; voyages
+              </a>
+            </li>
+            <li>
+              <a class="shortcuts__link" href="#enregistrements">
+                <span class="shortcuts__icon" data-tone="cream"><svg class="icon" aria-hidden="true"><use href="#icon-bookmark"></use></svg></span>Enregistrements
+              </a>
+            </li>
+            <li>
+              <a class="shortcuts__link" href="composants.html" data-nav="composants">
+                <span class="shortcuts__icon" data-tone="lilac"><svg class="icon" aria-hidden="true"><use href="#icon-palette"></use></svg></span>Kit d'interface
               </a>
             </li>
           </ul>
         </nav>
-
-        <!-- Affiché par app.js : sans JavaScript, le thème suit simplement le système. -->
-        <button class="theme-switch" type="button" role="switch" aria-checked="false" hidden>
-          <svg class="icon theme-switch__icon" aria-hidden="true"><use href="#icon-moon"></use></svg>
-          <span class="theme-switch__label">Mode sombre</span>
-          <span class="theme-switch__track" aria-hidden="true"></span>
-        </button>
 
         <a class="app-promo" href="#application">
           <span class="app-promo__icon">
@@ -256,7 +404,7 @@
           <img class="app-promo__avatar app-promo__avatar--3 avatar" src="assets/images/avatars/chris-ilunga.webp" alt="" width="160" height="160">
           <span class="app-promo__label">Télécharger l'app</span>
         </a>
-      </header>
+      </aside>
       <!-- /partial:sidebar -->
 
       <!-- ============ Colonne centrale : amis ============ -->

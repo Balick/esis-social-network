@@ -29,8 +29,9 @@
 
     // Les éléments de la page qui affichent une information du profil
     const targets = (key) => document.querySelectorAll(`[data-profile="${key}"]`)
-    const sidebarName = document.querySelector('.sidebar .profile__name')
-    const sidebarAvatar = document.querySelector('.sidebar .profile__avatar')
+    // Nom et avatar de l'utilisateur dans l'en-tête et la colonne de gauche
+    const myNames = document.querySelectorAll('[data-me="name"]')
+    const myAvatars = document.querySelectorAll('[data-me="avatar"]')
 
     // État courant du profil, lu une fois dans le HTML
     const state = {
@@ -94,8 +95,12 @@
         img.src = state.avatar
         img.alt = `Photo de profil de ${state.name}`
       })
-      if (sidebarName) sidebarName.textContent = state.name
-      if (sidebarAvatar) sidebarAvatar.src = state.avatar
+      myNames.forEach((el) => {
+        el.textContent = state.name
+      })
+      myAvatars.forEach((img) => {
+        img.src = state.avatar
+      })
       document.title = `${state.name} (@buzan) — Post it`
     }
 

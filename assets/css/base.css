@@ -86,7 +86,9 @@
     color: var(--color-text);
     background-color: var(--color-page);
     accent-color: var(--color-inverse);
-    scroll-padding-block: var(--space-8);
+
+    /* --sticky-offset : hauteur de l'en-tête collé en haut (layout.css) */
+    scroll-padding-block: calc(var(--sticky-offset, 0rem) + var(--space-8)) var(--space-8);
 
     @media (prefers-reduced-motion: no-preference) {
       scroll-behavior: smooth;

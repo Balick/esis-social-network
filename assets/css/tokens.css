@@ -103,10 +103,10 @@
     --duration: 250ms;
 
     /* ---------- Mise en page ---------- */
-    --shell-max: 78rem;
-    --sidebar-width: 14.5rem;
-    --rail-width: 4.5rem;
-    --aside-width: 14.5rem;
+    --shell-max: 82rem;
+    --topbar-height: 4.25rem;
+    --sidebar-width: 15rem;
+    --aside-width: 16rem;
     --bottom-nav-height: 4.25rem;
   }
 

@@ -7,7 +7,8 @@
  *   1. le thème clair / sombre / système, mémorisé ;
  *   2. les actions des boutons [data-action] (J'aime, réactions, Suivre, menus…) ;
  *   3. les commentaires des publications ;
- *   4. un repli pour les boîtes de dialogue et un toast pour les liens de démonstration.
+ *   4. un repli pour les boîtes de dialogue et un toast pour les liens de démonstration ;
+ *   5. l'en-tête : notifications et recherche.
  *
  * Chaque page peut ajouter ses propres actions dans son script (ex. feed.js) :
  *   postit.register('mon-action', (bouton, événement) => { … })
@@ -259,6 +260,33 @@
       event.preventDefault()
       notify('Cette page arrive bientôt sur Post it ✨')
     }
+  })
+
+  /* ------------------------------------------------------------------------
+   * 5. En-tête : notifications et recherche
+   * ---------------------------------------------------------------------- */
+
+  // « Tout marquer comme lu » : retire les pastilles et met à jour le bouton
+  register('mark-all-read', (button) => {
+    const panel = button.closest('.notifications')
+    panel.querySelectorAll('[data-unread]').forEach((item) => item.removeAttribute('data-unread'))
+    panel.querySelectorAll('.notifications__unread').forEach((label) => label.remove())
+    const trigger = document.querySelector(`[popovertarget="${panel.id}"]`)
+    trigger?.querySelector('.badge')?.remove()
+    trigger?.setAttribute('aria-label', 'Notifications')
+    button.disabled = true
+    notify('Toutes les notifications sont lues')
+  })
+
+  // Recherche de démonstration : il n'y a pas encore de page de résultats
+  document.querySelector('[data-search]')?.addEventListener('submit', (event) => {
+    event.preventDefault()
+    const query = event.target.elements.q.value.trim()
+    notify(
+      query
+        ? `La recherche « ${query} » arrive bientôt sur Post it ✨`
+        : 'Saisissez un nom, un sujet ou un #hashtag',
+    )
   })
 
   // API publique pour les scripts de page (feed.js, messages.js…)

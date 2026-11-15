@@ -17,10 +17,11 @@
  */
 
 @layer components {
-  /* Hauteur fixe sur bureau : la marge de .app ne doit pas « traverser » <body> (marges
-   * fusionnées), sinon la page dépasse l'écran de 2.5rem */
-  body:has(> .app > .messenger) {
-    display: flow-root;
+  /* Grand écran : la messagerie remplit l'écran, sans marge basse supplémentaire */
+  .app:has(> .messenger) {
+    @media (width >= 64rem) {
+      padding-block-end: var(--app-padding);
+    }
   }
 
   /* ---------- Les deux volets ---------- */
@@ -37,17 +38,12 @@
       }
     }
 
-    /* Grand écran : hauteur fixe, remplit l'écran (moins les marges de .app) */
+    /* Grand écran : hauteur fixe, remplit l'écran sous l'en-tête (moins les marges de .app) */
     @media (width >= 64rem) {
       grid-template-columns: minmax(15rem, 19rem) minmax(0, 1fr);
       align-content: stretch;
-      block-size: calc(100dvh - 2 * var(--app-padding));
+      block-size: calc(100dvh - var(--topbar-height) - 1px - 2 * var(--app-padding));
       min-block-size: 34rem;
-    }
-
-    /* Bureau : l'application est une carte posée avec une marge en haut et en bas */
-    @media (width >= 80rem) {
-      block-size: calc(100dvh - 2 * var(--app-padding) - 2 * var(--space-10));
       max-block-size: 62rem;
     }
   }
@@ -238,7 +234,7 @@
     /* Petit écran : l'en-tête reste visible pendant que la page défile */
     @media (width < 64rem) {
       position: sticky;
-      inset-block-start: 0;
+      inset-block-start: var(--sticky-offset, 0);
       z-index: 4;
       padding-inline: 0;
       background-color: var(--color-surface);
