@@ -1,0 +1,15 @@
+# Dépendances (outillage de lint uniquement)
+node_modules/
+
+# Fichiers système
+.DS_Store
+Thumbs.db
+
+# Journaux
+*.log
+
+# Éditeurs
+.idea/
+
+# Artefact local du déploiement GitHub Pages
+_site/

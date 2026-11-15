@@ -1,0 +1,32 @@
+{
+  "name": "post-it-esis",
+  "private": true,
+  "description": "Post it, le réseau social étudiant de l'ESIS : vitrine HTML/CSS moderne, sans framework ni étape de build.",
+  "license": "MIT",
+  "homepage": "https://balick.github.io/esiss-social-web-site/",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Balick/esiss-social-web-site.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Balick/esiss-social-web-site/issues"
+  },
+  "engines": {
+    "node": "^22.22.2 || >=24.15.0"
+  },
+  "scripts": {
+    "dev": "serve .",
+    "lint": "npm run lint:css && npm run lint:html && npm run lint:format",
+    "lint:css": "stylelint \"assets/css/**/*.css\"",
+    "lint:html": "html-validate index.html",
+    "lint:format": "prettier --check .",
+    "format": "prettier --write ."
+  },
+  "devDependencies": {
+    "html-validate": "^11.21.1",
+    "prettier": "^3.10.1",
+    "serve": "^14.2.8",
+    "stylelint": "^18.0.0",
+    "stylelint-config-standard": "^41.0.0"
+  }
+}

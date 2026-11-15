@@ -1,0 +1,8 @@
+{
+  "recommendations": [
+    "stylelint.vscode-stylelint",
+    "html-validate.vscode-html-validate",
+    "editorconfig.editorconfig",
+    "esbenp.prettier-vscode"
+  ]
+}

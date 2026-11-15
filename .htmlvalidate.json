@@ -1,0 +1,14 @@
+{
+  "$schema": "https://html-validate.org/schemas/config.json",
+  "extends": ["html-validate:recommended"],
+  "rules": {
+    "doctype-style": ["error", { "style": "lowercase" }],
+    "void-style": ["error", { "style": "omit" }],
+    "no-redundant-role": "off",
+    "no-inline-style": ["error", { "allowedProperties": [], "allowVariables": true }],
+    "heading-level": "error",
+    "input-missing-label": "error",
+    "missing-doctype": "error",
+    "no-missing-references": "error"
+  }
+}

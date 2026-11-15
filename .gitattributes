@@ -1,2 +1,12 @@
-# Auto detect text files and perform LF normalization
-* text=auto
+# Normalise les fins de ligne en LF pour tous les fichiers texte
+* text=auto eol=lf
+
+# Fichiers binaires : ni conversion de fin de ligne, ni diff textuel
+*.webp binary
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.woff2 binary
+
+# Les SVG sont du texte (XML)
+*.svg text

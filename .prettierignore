@@ -1,0 +1,13 @@
+# Dépendances et fichiers générés
+node_modules
+package-lock.json
+_site
+
+# Le HTML est validé par html-validate et mis en forme à la main
+*.html
+
+# Ressources binaires ou générées
+assets/icons/
+assets/fonts/
+assets/images/
+docs/*.webp
