@@ -1,0 +1,151 @@
+/*
+ * Squelette de l'application : une grille à 1, 2 ou 3 colonnes.
+ *
+ *   < 48rem        mobile   : profil en haut, fil, puis « Découvrir » ; navigation en bas d'écran
+ *   48rem – 64rem  tablette : rail d'icônes + fil ; « Découvrir » passe sous le fil
+ *   64rem – 80rem  portable : rail d'icônes + fil + « Découvrir »
+ *   ≥ 80rem        bureau   : barre latérale complète, application posée comme une carte
+ *
+ * Les composants, eux, s'adaptent à la place qu'on leur donne (container queries).
+ */
+
+@layer layout {
+  .app {
+    --app-padding: var(--space-4);
+
+    position: relative;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--space-8);
+    align-items: start;
+    min-block-size: 100dvh;
+    padding: var(--app-padding);
+    padding-block-end: calc(
+      var(--bottom-nav-height) + var(--space-8) + env(safe-area-inset-bottom)
+    );
+    background-color: var(--color-surface);
+
+    @media (width >= 48rem) {
+      --app-padding: var(--space-6);
+
+      grid-template-columns: var(--rail-width) minmax(0, 1fr);
+      column-gap: var(--space-6);
+      padding-block-end: var(--app-padding);
+    }
+
+    @media (width >= 64rem) {
+      grid-template-columns: var(--rail-width) minmax(0, 1fr) var(--aside-width);
+    }
+
+    @media (width >= 80rem) {
+      --app-padding: var(--space-8);
+
+      grid-template-columns: var(--sidebar-width) minmax(0, 1fr) var(--aside-width);
+      column-gap: var(--space-8);
+      max-inline-size: var(--shell-max);
+      min-block-size: auto;
+      margin: var(--space-10) auto;
+      border-radius: var(--radius-xl);
+      box-shadow: var(--shadow-lg);
+    }
+  }
+
+  /* Colonne de gauche : collée en haut quand l'écran est assez haut pour l'afficher en entier */
+  .sidebar {
+    /* Tablette : « Découvrir » forme une 2e rangée, le rail doit l'accompagner */
+    @media (48rem <= width < 64rem) {
+      grid-row: 1 / span 2;
+    }
+
+    @media (width >= 48rem) and (height >= 40rem) {
+      position: sticky;
+      inset-block-start: var(--app-padding);
+    }
+  }
+
+  .feed {
+    min-inline-size: 0;
+  }
+
+  /* Colonne de droite : sous le fil sur tablette, à droite au-delà */
+  .aside {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 14rem), 1fr));
+    gap: var(--space-8) var(--space-6);
+    align-content: start;
+    min-inline-size: 0;
+
+    @media (width >= 48rem) {
+      grid-column: 2;
+    }
+
+    @media (width >= 64rem) {
+      grid-column: 3;
+      grid-row: 1;
+    }
+
+    @media (width >= 64rem) and (height >= 54rem) {
+      position: sticky;
+      inset-block-start: var(--app-padding);
+    }
+  }
+
+  /* ---------- Décor : avatars flottants autour de la « carte » (très grands écrans) ---------- */
+  .app__decor {
+    display: none;
+
+    @media (width >= 90rem) {
+      position: absolute;
+      inset: 0;
+      display: block;
+      pointer-events: none;
+    }
+  }
+
+  .app__float {
+    position: absolute;
+    inline-size: 3.75rem;
+    block-size: 3.75rem;
+    border: 3px solid var(--color-surface);
+    border-radius: 50%;
+    object-fit: cover;
+    box-shadow: var(--shadow-md);
+    animation: float 6s ease-in-out infinite alternate;
+  }
+
+  .app__float--1 {
+    inset-block-start: 62%;
+    inset-inline-start: -1.875rem;
+  }
+
+  .app__float--2 {
+    inset-block-start: 24%;
+    inset-inline-end: -1.875rem;
+    animation-delay: -3s;
+  }
+
+  .app__dot {
+    position: absolute;
+    inline-size: 0.5rem;
+    aspect-ratio: 1;
+    border-radius: 50%;
+    background-color: var(--tone-violet);
+  }
+
+  .app__dot--1 {
+    inset-block-start: 1.25rem;
+    inset-inline-start: 1.75rem;
+  }
+
+  .app__dot--2 {
+    inset-block-end: 3rem;
+    inset-inline-end: 2rem;
+    background-color: var(--tone-rose);
+  }
+
+  @keyframes float {
+    to {
+      translate: 0 -0.75rem;
+    }
+  }
+}

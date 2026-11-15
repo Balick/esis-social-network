@@ -1,0 +1,42 @@
+/*
+ * Toast : court message de confirmation (« Lien copié », « Vous suivez … »).
+ * L'élément porte role="status" : son contenu est aussi annoncé aux lecteurs d'écran.
+ * app.js ajoute/retire la classe .is-visible.
+ */
+
+@layer components {
+  .toast {
+    position: fixed;
+    inset-block-end: calc(var(--space-6) + env(safe-area-inset-bottom));
+    inset-inline: 0;
+    z-index: 50;
+    inline-size: fit-content;
+    max-inline-size: calc(100% - var(--space-8));
+    padding: var(--space-3) var(--space-5);
+    margin-inline: auto;
+    font-size: var(--text-sm);
+    font-weight: var(--weight-medium);
+    color: var(--color-on-inverse);
+    text-align: center;
+    pointer-events: none;
+    background-color: var(--color-inverse);
+    border-radius: var(--radius-full);
+    box-shadow: var(--shadow-lg);
+    opacity: 0;
+    translate: 0 1rem;
+    transition:
+      opacity var(--duration) var(--ease-out),
+      translate var(--duration) var(--ease-spring);
+
+    &.is-visible {
+      opacity: 1;
+      translate: 0 0;
+    }
+
+    /* Mobile : en haut, pour ne masquer ni la navigation ni le compositeur */
+    @media (width < 48rem) {
+      inset-block: var(--space-4) auto;
+      translate: 0 -1rem;
+    }
+  }
+}

@@ -1,0 +1,107 @@
+/*
+ * Le fil : titre, filtre « Récents / Amis / Populaires » et liste des publications.
+ *
+ * Le filtre ne demande AUCUN JavaScript : ce sont de vrais boutons radio,
+ * et :has() masque les publications qui ne correspondent pas au choix coché.
+ */
+
+@layer components {
+  .feed {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+
+    /* Cible du lien d'évitement : pas d'anneau autour de toute la colonne */
+    &:focus {
+      outline: none;
+    }
+  }
+
+  .feed__header {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2) var(--space-4);
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .feed__title {
+    font-size: var(--text-xl);
+    font-weight: var(--weight-bold);
+  }
+
+  .feed__list {
+    display: grid;
+    gap: var(--space-4);
+  }
+
+  /* ---------- Filtre ---------- */
+  .feed-filter {
+    display: flex;
+    gap: var(--space-1);
+  }
+
+  .feed-filter__option {
+    position: relative;
+    padding: var(--space-1) var(--space-2);
+    font-size: var(--text-sm);
+    color: var(--color-text-muted);
+    cursor: pointer;
+    border-radius: var(--radius-sm);
+    transition: color var(--duration-fast) var(--ease-out);
+
+    &:hover {
+      color: var(--color-text);
+    }
+
+    /* Petit trait sous l'option active */
+    &::after {
+      position: absolute;
+      inset-block-end: -0.125rem;
+      inset-inline-start: 50%;
+      inline-size: 1rem;
+      block-size: 2px;
+      content: '';
+      background-color: currentcolor;
+      border-radius: var(--radius-full);
+      translate: -50% 0;
+      scale: 0 1;
+      transition: scale var(--duration) var(--ease-spring);
+    }
+
+    &:has(:checked) {
+      font-weight: var(--weight-medium);
+      color: var(--color-text);
+
+      &::after {
+        scale: 1;
+      }
+    }
+
+    &:has(:focus-visible) {
+      outline: 2px solid var(--color-focus);
+      outline-offset: 2px;
+    }
+  }
+
+  /* Le vrai bouton radio recouvre son libellé : invisible, mais cliquable et navigable au clavier */
+  .feed-filter__input {
+    position: absolute;
+    inset: 0;
+    margin: 0;
+    appearance: none;
+    cursor: pointer;
+    border-radius: inherit;
+
+    &:focus-visible {
+      outline: none;
+    }
+  }
+
+  /* ---------- La magie : filtrer sans JavaScript ---------- */
+  .feed:has(.feed-filter__input[value='friends']:checked) .post:not([data-friend]),
+  .feed:has(.feed-filter__input[value='popular']:checked) .post:not([data-popular]) {
+    display: none;
+    opacity: 0;
+  }
+}

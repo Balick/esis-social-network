@@ -1,0 +1,72 @@
+/*
+ * Boutons
+ *   .button             pilule de base
+ *   .button--primary    pilule « inversée » (noire en clair, blanche en sombre)
+ *   .button--small      variante compacte (ex. « Suivre »)
+ *   .icon-button        bouton rond qui ne contient qu'une icône (penser à aria-label)
+ */
+
+@layer components {
+  .button {
+    display: inline-flex;
+    gap: var(--space-2);
+    align-items: center;
+    justify-content: center;
+    min-block-size: 2.5rem;
+    padding: var(--space-2) var(--space-5);
+    font-size: var(--text-sm);
+    font-weight: var(--weight-semibold);
+    white-space: nowrap;
+    text-decoration: none;
+    border-radius: var(--radius-full);
+    transition:
+      background-color var(--duration-fast) var(--ease-out),
+      color var(--duration-fast) var(--ease-out),
+      box-shadow var(--duration-fast) var(--ease-out),
+      opacity var(--duration-fast) var(--ease-out),
+      scale var(--duration-fast) var(--ease-out);
+
+    &:active {
+      scale: 0.96;
+    }
+
+    & .icon {
+      inline-size: 1.1em;
+      block-size: 1.1em;
+    }
+  }
+
+  .button--primary {
+    color: var(--color-on-inverse);
+    background-color: var(--color-inverse);
+
+    &:hover {
+      background-color: color-mix(in oklch, var(--color-inverse) 82%, var(--color-accent));
+    }
+  }
+
+  .button--small {
+    gap: var(--space-1);
+    min-block-size: 1.75rem;
+    padding: var(--space-1) var(--space-3);
+    font-size: var(--text-2xs);
+  }
+
+  .icon-button {
+    display: inline-grid;
+    flex-shrink: 0;
+    place-items: center;
+    inline-size: 2.5rem;
+    aspect-ratio: 1;
+    color: var(--color-text);
+    border: 1px solid var(--color-border-strong);
+    border-radius: 50%;
+    transition: background-color var(--duration-fast) var(--ease-out);
+
+    /* Survol, ou popover associé ouvert (le popover suit le bouton dans le HTML) */
+    &:hover,
+    &:has(+ :popover-open) {
+      background-color: color-mix(in oklch, var(--color-surface) 65%, transparent);
+    }
+  }
+}

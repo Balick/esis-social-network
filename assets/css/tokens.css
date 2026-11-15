@@ -1,0 +1,114 @@
+/*
+ * Jetons de design (design tokens) de Post it.
+ *
+ * C'est la SEULE source des couleurs, espacements, rayons, ombres et durées :
+ * les composants ne codent jamais une valeur en dur, ils lisent ces variables.
+ *
+ * Thème clair/sombre : chaque couleur est déclarée une seule fois avec light-dark().
+ * Le thème suit le système (color-scheme: light dark) et peut être forcé
+ * via l'attribut data-theme="light" | "dark" sur <html> (voir assets/js/app.js).
+ */
+
+/* Ordre des couches de la cascade : une couche plus loin dans la liste l'emporte. */
+@layer reset, tokens, base, layout, components, utilities;
+
+@layer tokens {
+  :root {
+    color-scheme: light dark;
+
+    /* ---------- Typographie ---------- */
+    --font-sans: lexend, system-ui, -apple-system, 'Segoe UI', roboto, sans-serif;
+    --text-2xs: 0.6875rem; /* 11px */
+    --text-xs: 0.75rem; /* 12px */
+    --text-sm: 0.8125rem; /* 13px */
+    --text-md: 0.9375rem; /* 15px */
+    --text-lg: 1.0625rem; /* 17px */
+    --text-xl: clamp(1.25rem, 1.1rem + 0.4vw, 1.4rem);
+    --weight-regular: 400;
+    --weight-medium: 500;
+    --weight-semibold: 600;
+    --weight-bold: 700;
+    --leading-tight: 1.25;
+    --leading-normal: 1.6;
+
+    /* ---------- Espacements (échelle de 4px) ---------- */
+    --space-1: 0.25rem;
+    --space-2: 0.5rem;
+    --space-3: 0.75rem;
+    --space-4: 1rem;
+    --space-5: 1.25rem;
+    --space-6: 1.5rem;
+    --space-8: 2rem;
+    --space-10: 2.5rem;
+    --space-12: 3rem;
+
+    /* ---------- Rayons ---------- */
+    --radius-sm: 0.625rem;
+    --radius-md: 0.875rem;
+    --radius-lg: 1.375rem;
+    --radius-xl: 2.5rem;
+    --radius-full: 999px;
+
+    /* ---------- Couleurs de base ---------- */
+    --color-page: light-dark(oklch(84% 0.018 285deg), oklch(13% 0.012 285deg));
+    --color-page-glow-1: light-dark(oklch(72% 0.05 300deg / 55%), oklch(32% 0.08 300deg / 45%));
+    --color-page-glow-2: light-dark(oklch(86% 0.04 240deg / 80%), oklch(28% 0.06 240deg / 45%));
+    --color-surface: light-dark(oklch(100% 0 0deg), oklch(19% 0.012 285deg));
+    --color-surface-muted: light-dark(oklch(95.5% 0.004 285deg), oklch(23.5% 0.012 285deg));
+    --color-surface-raised: light-dark(oklch(100% 0 0deg), oklch(27% 0.014 285deg));
+    --color-text: light-dark(oklch(19% 0.01 285deg), oklch(96% 0.004 285deg));
+    --color-text-muted: light-dark(oklch(50% 0.015 285deg), oklch(74% 0.014 285deg));
+    --color-border: light-dark(oklch(90% 0.006 285deg), oklch(33% 0.012 285deg));
+    --color-border-strong: light-dark(oklch(19% 0.01 285deg / 16%), oklch(96% 0.004 285deg / 20%));
+
+    /* Pastilles « inversées » : noir sur clair, blanc sur sombre (boutons, onglet actif) */
+    --color-inverse: var(--color-text);
+    --color-on-inverse: var(--color-surface);
+
+    /* Accent rose (J'aime, réactions) */
+    --color-accent: light-dark(oklch(70% 0.17 3deg), oklch(74% 0.15 3deg));
+    --color-accent-text: light-dark(oklch(50% 0.19 3deg), oklch(82% 0.11 3deg));
+    --color-accent-soft: light-dark(oklch(85% 0.085 3deg), oklch(42% 0.1 3deg));
+    --color-mention: light-dark(oklch(40% 0.07 260deg), oklch(84% 0.06 260deg));
+    --color-focus: light-dark(oklch(55% 0.2 275deg), oklch(75% 0.15 275deg));
+    --color-online: oklch(72% 0.17 150deg);
+
+    /* ---------- Tons pastel (cartes, tuiles, avatars) ---------- */
+    --tone-sky: light-dark(oklch(93% 0.035 265deg), oklch(27% 0.04 265deg));
+    --tone-cream: light-dark(oklch(96.5% 0.04 88deg), oklch(28% 0.035 80deg));
+    --tone-mint: light-dark(oklch(94% 0.045 170deg), oklch(27% 0.035 170deg));
+    --tone-lilac: light-dark(oklch(93.5% 0.04 305deg), oklch(27% 0.04 305deg));
+    --tone-rose: light-dark(oklch(78% 0.13 3deg), oklch(52% 0.13 3deg));
+    --tone-violet: light-dark(oklch(72% 0.14 300deg), oklch(50% 0.14 300deg));
+    --tone-sun: light-dark(oklch(85% 0.13 85deg), oklch(60% 0.12 80deg));
+    --tone-azure: light-dark(oklch(84% 0.07 245deg), oklch(50% 0.09 245deg));
+
+    /* ---------- Ombres ---------- */
+    --shadow-color: light-dark(oklch(30% 0.04 285deg / 12%), oklch(0% 0 0deg / 45%));
+    --shadow-sm: 0 1px 2px var(--shadow-color);
+    --shadow-md: 0 0.5rem 1.5rem -0.5rem var(--shadow-color), 0 1px 3px var(--shadow-color);
+    --shadow-lg: 0 2rem 4rem -1.5rem var(--shadow-color), 0 0.5rem 1rem -0.5rem var(--shadow-color);
+
+    /* ---------- Mouvement ---------- */
+    --ease-out: cubic-bezier(0.2, 0.7, 0.2, 1);
+    --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+    --duration-fast: 150ms;
+    --duration: 250ms;
+
+    /* ---------- Mise en page ---------- */
+    --shell-max: 78rem;
+    --sidebar-width: 14.5rem;
+    --rail-width: 4.5rem;
+    --aside-width: 14.5rem;
+    --bottom-nav-height: 4.25rem;
+  }
+
+  /* Thème forcé par l'utilisateur (le bouton du menu) */
+  :root[data-theme='light'] {
+    color-scheme: light;
+  }
+
+  :root[data-theme='dark'] {
+    color-scheme: dark;
+  }
+}

@@ -1,0 +1,263 @@
+/*
+ * Compositeur de publication, collé en bas de l'écran (position: sticky).
+ *
+ * - Le champ grandit avec le texte (field-sizing: content).
+ * - « Envoyer » paraît inactif tant que le champ est vide (:placeholder-shown), sans JS.
+ * - Le <select> « Public » profite du select personnalisable (appearance: base-select)
+ *   là où il est pris en charge ; ailleurs, c'est un select natif discret.
+ * - En dessous d'une certaine largeur (container query), les outils n'affichent que l'icône.
+ */
+
+@layer components {
+  .composer {
+    position: sticky;
+    inset-block-end: var(--space-4);
+    z-index: 5;
+    container: composer / inline-size;
+    display: grid;
+    gap: var(--space-3);
+    padding: var(--space-4);
+    margin-block-start: var(--space-2);
+    background-color: var(--color-surface-muted);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-lg);
+
+    @media (width < 48rem) {
+      inset-block-end: calc(
+        var(--bottom-nav-height) + var(--space-5) + env(safe-area-inset-bottom)
+      );
+      gap: var(--space-2);
+      padding: var(--space-3);
+    }
+  }
+
+  /* ---------- Champ de saisie ---------- */
+  .composer__field {
+    display: flex;
+    gap: var(--space-2);
+    align-items: center;
+    padding: var(--space-1) var(--space-1) var(--space-1) var(--space-1);
+    background-color: var(--color-surface);
+    border-radius: 1.375rem;
+
+    &:focus-within {
+      outline: 2px solid var(--color-focus);
+      outline-offset: 2px;
+    }
+  }
+
+  .composer__input {
+    flex: 1;
+    min-inline-size: 0;
+    max-block-size: 10lh;
+    padding-block: var(--space-2);
+    line-height: 1.4;
+    resize: none;
+    field-sizing: content;
+    background: none;
+    border: 0;
+
+    &:focus {
+      outline: none;
+    }
+
+    &::placeholder {
+      color: var(--color-text-muted);
+      opacity: 1;
+    }
+  }
+
+  .composer__emoji {
+    inline-size: 2.25rem;
+    color: var(--color-text-muted);
+    border: 0;
+
+    &:hover {
+      color: var(--color-text);
+      background-color: var(--color-surface-muted);
+    }
+  }
+
+  /* ---------- Pièces jointes (ajoutées par app.js) ---------- */
+  .composer__attachments {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+  }
+
+  .chip {
+    display: inline-flex;
+    gap: var(--space-2);
+    align-items: center;
+    max-inline-size: 100%;
+    padding: var(--space-1) var(--space-1) var(--space-1) var(--space-3);
+    font-size: var(--text-xs);
+    font-weight: var(--weight-medium);
+    background-color: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-full);
+  }
+
+  .chip__thumb {
+    inline-size: 1.5rem;
+    block-size: 1.5rem;
+    margin-inline-start: calc(var(--space-2) * -1);
+    object-fit: cover;
+    border-radius: 50%;
+  }
+
+  .chip__label {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .chip__remove {
+    display: grid;
+    flex-shrink: 0;
+    place-items: center;
+    inline-size: 1.5rem;
+    aspect-ratio: 1;
+    color: var(--color-text-muted);
+    border-radius: 50%;
+
+    &:hover {
+      color: var(--color-text);
+      background-color: var(--color-surface-muted);
+    }
+  }
+
+  /* ---------- Barre d'outils ---------- */
+  .composer__toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-1) var(--space-2);
+    align-items: center;
+  }
+
+  .composer__tool {
+    position: relative;
+    display: inline-flex;
+    gap: var(--space-2);
+    align-items: center;
+    min-block-size: 2.25rem;
+    padding-inline: var(--space-2);
+    font-size: var(--text-sm);
+    font-weight: var(--weight-medium);
+    cursor: pointer;
+    border-radius: var(--radius-sm);
+    transition:
+      background-color var(--duration-fast) var(--ease-out),
+      color var(--duration-fast) var(--ease-out);
+
+    &:hover {
+      background-color: color-mix(in oklch, var(--color-text) 6%, transparent);
+    }
+
+    /* Le champ fichier est masqué : l'anneau de focus se reporte sur son libellé */
+    &:has(:focus-visible) {
+      outline: 2px solid var(--color-focus);
+      outline-offset: 2px;
+    }
+
+    &[aria-pressed='true'] {
+      color: var(--color-accent-text);
+      background-color: color-mix(in oklch, var(--color-accent-soft) 60%, transparent);
+    }
+  }
+
+  .composer__audience {
+    padding-inline-end: var(--space-1);
+  }
+
+  .composer__select {
+    padding-inline-end: 1.5rem;
+    margin-inline-end: -1.25rem;
+    font-weight: var(--weight-medium);
+    cursor: pointer;
+    appearance: none;
+    background: none;
+    border: 0;
+
+    &:focus-visible {
+      outline: none;
+    }
+  }
+
+  .composer__caret {
+    inline-size: 0.875rem;
+    block-size: 0.875rem;
+    pointer-events: none;
+  }
+
+  .composer__submit {
+    margin-inline-start: auto;
+
+    /* Champ vide : le bouton paraît inactif (la validation HTML « required » fait le reste) */
+    .composer:has(.composer__input:placeholder-shown) & {
+      opacity: 0.5;
+    }
+  }
+
+  /* Petite largeur : icônes seules, libellés conservés pour les lecteurs d'écran */
+  @container composer (inline-size < 30rem) {
+    .composer__tool-label,
+    .composer__submit-label {
+      position: absolute;
+      inline-size: 1px;
+      block-size: 1px;
+      overflow: hidden;
+      white-space: nowrap;
+      clip-path: inset(50%);
+    }
+
+    /* « Envoyer » devient un bouton rond à icône (son nom reste « Envoyer ») */
+    .composer__submit {
+      inline-size: 2.5rem;
+      padding: 0;
+    }
+  }
+
+  /* ---------- Select personnalisable (Chrome 135+ ; ignoré ailleurs) ---------- */
+  @supports (appearance: base-select) {
+    .composer__select,
+    .composer__select::picker(select) {
+      appearance: base-select;
+    }
+
+    .composer__select {
+      padding: 0 1.5rem 0 0;
+
+      &::picker-icon {
+        display: none;
+      }
+    }
+
+    .composer__select::picker(select) {
+      padding: var(--space-1);
+      margin-block: var(--space-2);
+      color: var(--color-text);
+      background-color: var(--color-surface-raised);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-md);
+      box-shadow: var(--shadow-lg);
+    }
+
+    .composer__select option {
+      gap: var(--space-2);
+      padding: var(--space-2) var(--space-3);
+      font-size: var(--text-sm);
+      border-radius: var(--radius-sm);
+
+      &:hover,
+      &:focus-visible {
+        background-color: var(--color-surface-muted);
+      }
+
+      &:checked {
+        font-weight: var(--weight-semibold);
+      }
+    }
+  }
+}

@@ -1,0 +1,80 @@
+/*
+ * Utilitaires : petites classes à usage unique, prioritaires sur les composants
+ * (couche « utilities », la dernière de la cascade).
+ */
+
+@layer utilities {
+  /* Masqué à l'écran, mais lu par les lecteurs d'écran */
+  .visually-hidden {
+    position: absolute !important;
+    inline-size: 1px !important;
+    block-size: 1px !important;
+    padding: 0 !important;
+    margin: -1px !important;
+    overflow: hidden !important;
+    white-space: nowrap !important;
+    border: 0 !important;
+    clip-path: inset(50%) !important;
+  }
+
+  /* Le sprite d'icônes : présent dans le DOM (pour les dégradés du logo) mais sans place à l'écran */
+  .sprite {
+    position: absolute;
+    inline-size: 0;
+    block-size: 0;
+    overflow: hidden;
+  }
+
+  /* Lien d'évitement : visible uniquement au clavier */
+  .skip-link {
+    position: fixed;
+    inset-block-start: var(--space-3);
+    inset-inline-start: var(--space-3);
+    z-index: 100;
+    padding: var(--space-2) var(--space-4);
+    font-weight: var(--weight-semibold);
+    color: var(--color-on-inverse);
+    text-decoration: none;
+    background-color: var(--color-inverse);
+    border-radius: var(--radius-full);
+    translate: 0 -200%;
+    transition: translate var(--duration) var(--ease-out);
+
+    &:focus-visible {
+      translate: 0 0;
+    }
+  }
+
+  /* data-tone="…" → variable --tone, lue par les cartes, avatars et tuiles */
+  [data-tone='sky'] {
+    --tone: var(--tone-sky);
+  }
+
+  [data-tone='cream'] {
+    --tone: var(--tone-cream);
+  }
+
+  [data-tone='mint'] {
+    --tone: var(--tone-mint);
+  }
+
+  [data-tone='lilac'] {
+    --tone: var(--tone-lilac);
+  }
+
+  [data-tone='rose'] {
+    --tone: var(--tone-rose);
+  }
+
+  [data-tone='violet'] {
+    --tone: var(--tone-violet);
+  }
+
+  [data-tone='sun'] {
+    --tone: var(--tone-sun);
+  }
+
+  [data-tone='azure'] {
+    --tone: var(--tone-azure);
+  }
+}

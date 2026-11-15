@@ -1,0 +1,144 @@
+/*
+ * Reset moderne + styles de base des éléments HTML.
+ * Aucune classe de composant ici : uniquement des sélecteurs d'éléments
+ * et quelques primitives transverses (.icon).
+ */
+
+@layer reset {
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
+  }
+
+  * {
+    margin: 0;
+  }
+
+  html {
+    text-size-adjust: none;
+  }
+
+  body {
+    min-block-size: 100dvh;
+    line-height: var(--leading-normal);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  img,
+  picture,
+  svg,
+  video {
+    display: block;
+    max-inline-size: 100%;
+  }
+
+  input,
+  button,
+  textarea,
+  select {
+    font: inherit;
+    letter-spacing: inherit;
+    color: inherit;
+  }
+
+  button {
+    padding: 0;
+    background: none;
+    border: 0;
+    cursor: pointer;
+  }
+
+  fieldset {
+    min-inline-size: 0;
+    padding: 0;
+    border: 0;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  p {
+    overflow-wrap: break-word;
+  }
+
+  /* role="list" : on retire les puces sans perdre la sémantique de liste (VoiceOver). */
+  :where(ul, ol)[role='list'] {
+    padding: 0;
+    list-style: none;
+  }
+
+  [hidden]:not([hidden='until-found']) {
+    display: none !important;
+  }
+}
+
+@layer base {
+  html {
+    font-family: var(--font-sans);
+    color: var(--color-text);
+    background-color: var(--color-page);
+    accent-color: var(--color-inverse);
+    scroll-padding-block: var(--space-8);
+
+    @media (prefers-reduced-motion: no-preference) {
+      scroll-behavior: smooth;
+      interpolate-size: allow-keywords;
+    }
+  }
+
+  body {
+    font-size: var(--text-md);
+    background:
+      radial-gradient(60rem 40rem at 5% 0%, var(--color-page-glow-1), transparent 70%),
+      radial-gradient(50rem 45rem at 100% 100%, var(--color-page-glow-2), transparent 70%),
+      var(--color-page);
+    background-attachment: fixed;
+  }
+
+  h1,
+  h2,
+  h3 {
+    font-weight: var(--weight-semibold);
+    line-height: var(--leading-tight);
+    text-wrap: balance;
+  }
+
+  p {
+    text-wrap: pretty;
+  }
+
+  a {
+    color: inherit;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 0.2em;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-focus);
+    outline-offset: 2px;
+  }
+
+  ::selection {
+    background-color: var(--color-accent-soft);
+  }
+
+  /* Icône du sprite : <svg class="icon"><use href="#icon-…"></use></svg> */
+  .icon {
+    flex-shrink: 0;
+    inline-size: 1.25em;
+    block-size: 1.25em;
+    fill: currentcolor;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      transition-duration: 0.01ms !important;
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+    }
+  }
+}

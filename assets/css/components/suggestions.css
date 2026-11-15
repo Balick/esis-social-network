@@ -1,0 +1,76 @@
+/*
+ * Suggestions de personnes à suivre.
+ * Le bouton « Suivre » devient « Abonné·e » via app.js (attribut data-following).
+ */
+
+@layer components {
+  .suggestions__list {
+    display: grid;
+    gap: var(--space-4);
+  }
+
+  .suggestion {
+    display: flex;
+    gap: var(--space-3);
+    align-items: center;
+  }
+
+  /* Anneau coloré : le fond de l'avatar apparaît autour de la photo grâce au padding */
+  .suggestion__avatar {
+    padding: 0.1875rem;
+  }
+
+  .suggestion__body {
+    display: grid;
+    flex: 1;
+    min-inline-size: 0;
+    line-height: var(--leading-tight);
+  }
+
+  .suggestion__name {
+    font-size: var(--text-sm);
+    font-weight: var(--weight-semibold);
+  }
+
+  .suggestion__info {
+    margin-block-start: 0.125rem;
+    font-size: var(--text-2xs);
+    color: var(--color-text-muted);
+  }
+
+  .suggestion__follow {
+    color: var(--color-on-inverse);
+    background-color: var(--color-inverse);
+
+    & .icon {
+      display: none;
+    }
+
+    &:hover {
+      background-color: color-mix(in oklch, var(--color-inverse) 82%, var(--color-accent));
+    }
+
+    &[data-following] {
+      color: var(--color-text);
+      background-color: transparent;
+      box-shadow: inset 0 0 0 1px var(--color-border-strong);
+
+      & .icon {
+        display: block;
+      }
+    }
+  }
+
+  .suggestions__more {
+    display: inline-block;
+    margin-block-start: var(--space-4);
+    font-size: var(--text-xs);
+    color: var(--color-text-muted);
+    text-decoration: none;
+
+    &:hover {
+      color: var(--color-text);
+      text-decoration: underline;
+    }
+  }
+}

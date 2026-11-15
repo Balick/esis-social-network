@@ -1,0 +1,173 @@
+/*
+ * Popovers : menu d'options (.menu) et sélecteur d'emojis (.emoji-picker).
+ *
+ * Ouverture/fermeture : 100 % HTML grâce à l'API popover
+ *   <button popovertarget="id"> … <div id="id" popover>
+ * (Échap et le clic à l'extérieur ferment le popover, sans JavaScript.)
+ *
+ * Placement : CSS Anchor Positioning, chaque popover se colle à son bouton.
+ * Les noms d'ancre sont « scopés » par carte (anchor-scope), d'où la garde @supports.
+ * Navigateurs plus anciens : le popover s'affiche centré, façon boîte de dialogue.
+ *
+ * Attention : ne jamais mettre « display » sur un popover fermé (cela l'afficherait).
+ * On le définit uniquement sur :popover-open.
+ */
+
+@layer components {
+  .menu,
+  .emoji-picker {
+    padding: var(--space-1);
+    color: var(--color-text);
+    background-color: var(--color-surface-raised);
+    border: 1px solid var(--color-border);
+    box-shadow: var(--shadow-lg);
+    opacity: 0;
+    scale: 0.94;
+    transition:
+      opacity var(--duration-fast) var(--ease-out),
+      scale var(--duration-fast) var(--ease-out),
+      display var(--duration-fast) allow-discrete,
+      overlay var(--duration-fast) allow-discrete;
+
+    &:popover-open {
+      opacity: 1;
+      scale: 1;
+
+      @starting-style {
+        opacity: 0;
+        scale: 0.94;
+      }
+    }
+
+    &::backdrop {
+      background-color: oklch(0% 0 0deg / 20%);
+    }
+  }
+
+  /* ---------- Menu d'options ---------- */
+  .menu {
+    min-inline-size: 12rem;
+    border-radius: var(--radius-md);
+  }
+
+  .menu__item {
+    display: flex;
+    gap: var(--space-3);
+    align-items: center;
+    inline-size: 100%;
+    padding: var(--space-2) var(--space-3);
+    font-size: var(--text-sm);
+    text-align: start;
+    border-radius: var(--radius-sm);
+
+    &:hover,
+    &:focus-visible {
+      background-color: var(--color-surface-muted);
+    }
+
+    & .icon {
+      color: var(--color-text-muted);
+    }
+  }
+
+  .menu__item--danger,
+  .menu__item--danger .icon {
+    color: var(--color-accent-text);
+  }
+
+  /* ---------- Sélecteur d'emojis ---------- */
+  .emoji-picker {
+    border-radius: var(--radius-full);
+
+    &:popover-open {
+      display: flex;
+      gap: 0.125rem;
+      align-items: center;
+    }
+  }
+
+  .emoji-picker__option {
+    display: grid;
+    place-items: center;
+    inline-size: 2.25rem;
+    aspect-ratio: 1;
+    font-size: 1.25rem;
+    line-height: 1;
+    border-radius: 50%;
+    transition:
+      scale var(--duration) var(--ease-spring),
+      translate var(--duration) var(--ease-spring);
+
+    &:hover,
+    &:focus-visible {
+      scale: 1.3;
+      translate: 0 -0.25rem;
+    }
+  }
+
+  .emoji-picker__close {
+    display: grid;
+    place-items: center;
+    inline-size: 1.75rem;
+    aspect-ratio: 1;
+    margin-inline: var(--space-1) 0.125rem;
+    font-size: var(--text-xs);
+    border: 1px solid var(--color-border-strong);
+    border-radius: 50%;
+
+    &:hover {
+      background-color: var(--color-surface-muted);
+    }
+  }
+
+  /* ---------- Placement ancré (navigateurs compatibles) ---------- */
+  @supports (anchor-scope: all) and (position-area: top) {
+    .post {
+      anchor-scope: --post-menu, --reaction;
+    }
+
+    .post__more {
+      anchor-name: --post-menu;
+    }
+
+    .reaction__trigger {
+      anchor-name: --reaction;
+    }
+
+    .composer__emoji {
+      anchor-name: --composer-emoji;
+    }
+
+    .menu,
+    .emoji-picker {
+      inset: auto;
+      margin: var(--space-2) 0;
+      position-try-fallbacks:
+        flip-block,
+        flip-inline,
+        flip-block flip-inline;
+
+      &::backdrop {
+        background: none;
+      }
+    }
+
+    .menu {
+      position-anchor: --post-menu;
+      position-area: bottom span-left;
+      transform-origin: top right;
+    }
+
+    .reaction__picker {
+      position-anchor: --reaction;
+      position-area: top span-left;
+      transform-origin: bottom right;
+    }
+
+    .composer__emojis {
+      position-anchor: --composer-emoji;
+      position-area: top span-left;
+      transform-origin: bottom right;
+    }
+  }
+}
