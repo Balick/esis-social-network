@@ -1,0 +1,51 @@
+name: Déploiement GitHub Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Un seul déploiement à la fois ; on laisse aller au bout celui en cours.
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    name: Préparer le site
+    runs-on: ubuntu-latest
+    steps:
+      - name: Récupérer le code
+        uses: actions/checkout@v7
+
+      - name: Configurer GitHub Pages
+        uses: actions/configure-pages@v6
+
+      # Seuls index.html et assets/ sont publiés (ni docs, ni outillage).
+      - name: Copier uniquement les fichiers publics
+        run: |
+          mkdir -p _site
+          cp index.html _site/
+          cp -R assets _site/
+
+      - name: Téléverser l'artefact
+        uses: actions/upload-pages-artifact@v5
+        with:
+          path: _site
+
+  deploy:
+    name: Déployer
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Déployer sur GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v5
