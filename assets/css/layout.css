@@ -17,6 +17,7 @@
     display: grid;
     grid-template-columns: minmax(0, 1fr);
     gap: var(--space-8);
+    align-content: start; /* page courte : les rangées ne s'étirent pas */
     align-items: start;
     min-block-size: 100dvh;
     padding: var(--app-padding);
@@ -47,6 +48,26 @@
       margin: var(--space-10) auto;
       border-radius: var(--radius-xl);
       box-shadow: var(--shadow-lg);
+    }
+  }
+
+  /* Pages sans colonne « Découvrir » (messages, paramètres…) : le contenu prend la place */
+  .app:not(:has(> .aside)) {
+    @media (width >= 64rem) {
+      grid-template-columns: var(--rail-width) minmax(0, 1fr);
+    }
+
+    @media (width >= 80rem) {
+      grid-template-columns: var(--sidebar-width) minmax(0, 1fr);
+    }
+  }
+
+  /* Contenu principal de toutes les pages (<main id="main" tabindex="-1"> : cible du lien d'évitement) */
+  .app > main {
+    min-inline-size: 0;
+
+    &:focus {
+      outline: none;
     }
   }
 

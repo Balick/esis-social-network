@@ -1,0 +1,120 @@
+/*
+ * Boîte de dialogue modale : l'élément natif <dialog>.
+ *
+ *   <button type="button" commandfor="new-topic" command="show-modal">Nouveau sujet</button>
+ *
+ *   <dialog class="dialog" id="new-topic" closedby="any" aria-labelledby="new-topic-title">
+ *     <div class="dialog__header">
+ *       <h2 class="dialog__title" id="new-topic-title">Nouveau sujet</h2>
+ *       <button class="icon-button" type="button" commandfor="new-topic" command="close" aria-label="Fermer">…</button>
+ *     </div>
+ *     <form class="dialog__body" method="dialog">…</form>
+ *   </dialog>
+ *
+ * - Ouverture/fermeture en HTML : Invoker Commands (command / commandfor), Échap,
+ *   clic à l'extérieur (closedby="any"), <form method="dialog">. app.js fournit un
+ *   repli pour les navigateurs qui ne connaissent pas encore « command ».
+ * - Le focus est piégé dans la boîte et rendu au bouton d'origine : c'est natif.
+ * - Sur mobile, la boîte devient une feuille qui monte du bas de l'écran.
+ */
+
+@layer components {
+  .dialog {
+    inline-size: min(34rem, 100% - 2rem);
+    max-block-size: min(90dvh, 48rem);
+    padding: 0;
+    color: var(--color-text);
+    background-color: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-lg);
+    opacity: 0;
+    translate: 0 1rem;
+    transition:
+      opacity var(--duration) var(--ease-out),
+      translate var(--duration) var(--ease-out),
+      display var(--duration) allow-discrete,
+      overlay var(--duration) allow-discrete;
+
+    &[open] {
+      display: flex;
+      flex-direction: column;
+      opacity: 1;
+      translate: 0 0;
+
+      @starting-style {
+        opacity: 0;
+        translate: 0 1rem;
+      }
+    }
+
+    &::backdrop {
+      background-color: oklch(0% 0 0deg / 0%);
+      transition:
+        background-color var(--duration) var(--ease-out),
+        backdrop-filter var(--duration) var(--ease-out),
+        display var(--duration) allow-discrete,
+        overlay var(--duration) allow-discrete;
+    }
+
+    &[open]::backdrop {
+      background-color: oklch(0% 0 0deg / 45%);
+      backdrop-filter: blur(4px);
+
+      @starting-style {
+        background-color: oklch(0% 0 0deg / 0%);
+        backdrop-filter: blur(0);
+      }
+    }
+
+    /* Mobile : feuille collée en bas de l'écran */
+    @media (width < 48rem) {
+      inline-size: 100%;
+      max-inline-size: 100%;
+      margin-block-end: 0;
+      border-end-start-radius: 0;
+      border-end-end-radius: 0;
+      translate: 0 100%;
+
+      &[open] {
+        @starting-style {
+          translate: 0 100%;
+        }
+      }
+    }
+  }
+
+  .dialog--wide {
+    inline-size: min(48rem, 100% - 2rem);
+  }
+
+  .dialog__header {
+    display: flex;
+    gap: var(--space-4);
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--space-5) var(--space-5) 0;
+  }
+
+  .dialog__title {
+    font-size: var(--text-lg);
+    font-weight: var(--weight-bold);
+  }
+
+  .dialog__body {
+    display: grid;
+    gap: var(--space-4);
+    padding: var(--space-5);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+  }
+
+  .dialog__footer {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+    justify-content: flex-end;
+    padding: var(--space-4) var(--space-5) var(--space-5);
+    border-block-start: 1px solid var(--color-border);
+  }
+}

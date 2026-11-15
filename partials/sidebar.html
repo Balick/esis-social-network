@@ -1,0 +1,71 @@
+<!-- ============ Colonne de gauche : profil + navigation ============ -->
+<header class="sidebar">
+  <a class="profile" href="profil.html" data-nav="profil">
+    <span class="profile__media">
+      <svg class="profile__logo" aria-hidden="true"><use href="#logo"></use></svg>
+      <img class="profile__avatar avatar" src="assets/images/avatars/ben-uzan.webp" alt="" width="160" height="160">
+    </span>
+    <span class="profile__name">Ben Uzan</span>
+    <span class="profile__handle"><span class="visually-hidden">, </span>@buzan</span>
+  </a>
+
+  <nav class="nav" aria-label="Navigation principale">
+    <ul class="nav__list" role="list">
+      <li>
+        <a class="nav__link" href="index.html" data-nav="fil">
+          <svg class="icon" aria-hidden="true"><use href="#icon-compass"></use></svg>
+          <span class="nav__label">Fil d'actualité</span>
+        </a>
+      </li>
+      <li>
+        <a class="nav__link" href="messages.html" data-nav="messages">
+          <svg class="icon" aria-hidden="true"><use href="#icon-envelope"></use></svg>
+          <span class="nav__label">Messages</span>
+          <span class="badge"><span class="visually-hidden">, </span>6<span class="visually-hidden"> non lus</span></span>
+        </a>
+      </li>
+      <li>
+        <a class="nav__link" href="forums.html" data-nav="forums">
+          <svg class="icon" aria-hidden="true"><use href="#icon-chats"></use></svg>
+          <span class="nav__label">Forums</span>
+        </a>
+      </li>
+      <li>
+        <a class="nav__link" href="amis.html" data-nav="amis">
+          <svg class="icon" aria-hidden="true"><use href="#icon-users"></use></svg>
+          <span class="nav__label">Amis</span>
+          <span class="badge"><span class="visually-hidden">, </span>3<span class="visually-hidden"> demandes</span></span>
+        </a>
+      </li>
+      <li>
+        <a class="nav__link" href="agenda.html" data-nav="agenda">
+          <svg class="icon" aria-hidden="true"><use href="#icon-calendar"></use></svg>
+          <span class="nav__label">Agenda</span>
+        </a>
+      </li>
+      <li>
+        <a class="nav__link" href="parametres.html" data-nav="parametres">
+          <svg class="icon" aria-hidden="true"><use href="#icon-gear"></use></svg>
+          <span class="nav__label">Paramètres</span>
+        </a>
+      </li>
+    </ul>
+  </nav>
+
+  <!-- Affiché par app.js : sans JavaScript, le thème suit simplement le système. -->
+  <button class="theme-switch" type="button" role="switch" aria-checked="false" hidden>
+    <svg class="icon theme-switch__icon" aria-hidden="true"><use href="#icon-moon"></use></svg>
+    <span class="theme-switch__label">Mode sombre</span>
+    <span class="theme-switch__track" aria-hidden="true"></span>
+  </button>
+
+  <a class="app-promo" href="#application">
+    <span class="app-promo__icon">
+      <svg aria-hidden="true"><use href="#logo"></use></svg>
+    </span>
+    <img class="app-promo__avatar app-promo__avatar--1 avatar" src="assets/images/avatars/olivier-ngoy.webp" alt="" width="160" height="160">
+    <img class="app-promo__avatar app-promo__avatar--2 avatar" src="assets/images/avatars/sarah-kalala.webp" alt="" width="160" height="160">
+    <img class="app-promo__avatar app-promo__avatar--3 avatar" src="assets/images/avatars/chris-ilunga.webp" alt="" width="160" height="160">
+    <span class="app-promo__label">Télécharger l'app</span>
+  </a>
+</header>

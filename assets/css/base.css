@@ -15,6 +15,12 @@
     margin: 0;
   }
 
+  /* … sauf là où le navigateur centre avec margin: auto (boîtes de dialogue, popovers) */
+  dialog,
+  [popover] {
+    margin: auto;
+  }
+
   html {
     text-size-adjust: none;
   }
@@ -95,6 +101,14 @@
       radial-gradient(50rem 45rem at 100% 100%, var(--color-page-glow-2), transparent 70%),
       var(--color-page);
     background-attachment: fixed;
+  }
+
+  code,
+  kbd,
+  pre,
+  samp {
+    font-family: var(--font-mono);
+    font-size: 0.9em;
   }
 
   h1,

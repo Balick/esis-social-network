@@ -1,0 +1,107 @@
+/*
+ * Onglets 100 % CSS (jusqu'à 6), sur le même principe que le filtre du fil :
+ * de vrais boutons radio, et :has() n'affiche que le panneau de l'onglet coché.
+ *
+ *   <div class="tabs">
+ *     <fieldset class="tabs__list">
+ *       <legend class="visually-hidden">Sections du profil</legend>
+ *       <label class="tabs__tab"><input type="radio" name="profil-tab" checked>Publications</label>
+ *       <label class="tabs__tab"><input type="radio" name="profil-tab">Médias</label>
+ *     </fieldset>
+ *     <section class="tabs__panel" aria-label="Publications">…</section>
+ *     <section class="tabs__panel" aria-label="Médias">…</section>
+ *   </div>
+ *
+ * Règles : les onglets sont les seuls <label> de la liste, les panneaux sont les
+ * seuls <section> enfants de .tabs, et ils sont dans le même ordre.
+ */
+
+@layer components {
+  .tabs {
+    display: grid;
+    gap: var(--space-5);
+  }
+
+  .tabs__list {
+    display: flex;
+    gap: var(--space-1);
+    padding: var(--space-1);
+    overflow-x: auto;
+    scrollbar-width: none;
+    background-color: var(--color-surface-muted);
+    border-radius: var(--radius-full);
+  }
+
+  .tabs__tab {
+    position: relative;
+    flex: 1 0 auto;
+    padding: var(--space-2) var(--space-4);
+    font-size: var(--text-sm);
+    font-weight: var(--weight-medium);
+    color: var(--color-text-muted);
+    text-align: center;
+    white-space: nowrap;
+    cursor: pointer;
+    border-radius: var(--radius-full);
+    transition:
+      color var(--duration-fast) var(--ease-out),
+      background-color var(--duration-fast) var(--ease-out),
+      box-shadow var(--duration-fast) var(--ease-out);
+
+    &:hover {
+      color: var(--color-text);
+    }
+
+    &:has(:checked) {
+      color: var(--color-text);
+      background-color: var(--color-surface);
+      box-shadow: var(--shadow-sm);
+    }
+
+    &:has(:focus-visible) {
+      outline: 2px solid var(--color-focus);
+      outline-offset: 2px;
+    }
+
+    /* Le radio recouvre l'onglet : invisible, cliquable, navigable aux flèches */
+    & input {
+      position: absolute;
+      inset: 0;
+      margin: 0;
+      cursor: pointer;
+      appearance: none;
+      border-radius: inherit;
+
+      &:focus-visible {
+        outline: none;
+      }
+    }
+  }
+
+  .tabs__count {
+    margin-inline-start: var(--space-1);
+    font-size: var(--text-xs);
+    color: var(--color-text-muted);
+  }
+
+  /* Un seul panneau visible : celui qui a le même rang que l'onglet coché */
+  .tabs:has(.tabs__tab:nth-of-type(1) :checked) > .tabs__panel:not(:nth-of-type(1)),
+  .tabs:has(.tabs__tab:nth-of-type(2) :checked) > .tabs__panel:not(:nth-of-type(2)),
+  .tabs:has(.tabs__tab:nth-of-type(3) :checked) > .tabs__panel:not(:nth-of-type(3)),
+  .tabs:has(.tabs__tab:nth-of-type(4) :checked) > .tabs__panel:not(:nth-of-type(4)),
+  .tabs:has(.tabs__tab:nth-of-type(5) :checked) > .tabs__panel:not(:nth-of-type(5)),
+  .tabs:has(.tabs__tab:nth-of-type(6) :checked) > .tabs__panel:not(:nth-of-type(6)) {
+    display: none;
+  }
+
+  .tabs__panel {
+    animation: tab-in var(--duration) var(--ease-out);
+  }
+
+  @keyframes tab-in {
+    from {
+      opacity: 0;
+      translate: 0 0.5rem;
+    }
+  }
+}

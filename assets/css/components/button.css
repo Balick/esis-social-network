@@ -2,7 +2,10 @@
  * Boutons
  *   .button             pilule de base
  *   .button--primary    pilule « inversée » (noire en clair, blanche en sombre)
+ *   .button--ghost      contour discret (action secondaire)
+ *   .button--danger     action destructrice (supprimer, quitter…)
  *   .button--small      variante compacte (ex. « Suivre »)
+ *   .button--block      pleine largeur (formulaires de connexion…)
  *   .icon-button        bouton rond qui ne contient qu'une icône (penser à aria-label)
  */
 
@@ -43,6 +46,34 @@
     &:hover {
       background-color: color-mix(in oklch, var(--color-inverse) 82%, var(--color-accent));
     }
+  }
+
+  .button--ghost {
+    color: var(--color-text);
+    box-shadow: inset 0 0 0 1px var(--color-border-strong);
+
+    &:hover {
+      background-color: var(--color-surface-muted);
+    }
+  }
+
+  .button--danger {
+    color: var(--color-on-inverse);
+    background-color: var(--color-danger);
+
+    &:hover {
+      background-color: color-mix(in oklch, var(--color-danger) 85%, var(--color-text));
+    }
+  }
+
+  .button--block {
+    inline-size: 100%;
+  }
+
+  .button:disabled,
+  .button[aria-disabled='true'] {
+    cursor: not-allowed;
+    opacity: 0.5;
   }
 
   .button--small {
