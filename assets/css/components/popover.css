@@ -6,7 +6,7 @@
  * (Échap et le clic à l'extérieur ferment le popover, sans JavaScript.)
  *
  * Placement : CSS Anchor Positioning, chaque popover se colle à son bouton.
- * Les noms d'ancre sont « scopés » par carte (anchor-scope), d'où la garde @supports.
+ * (ancre implicite : le bouton qui l'ouvre), où que se trouve le popover dans la page.
  * Navigateurs plus anciens : le popover s'affiche centré, façon boîte de dialogue.
  *
  * Attention : ne jamais mettre « display » sur un popover fermé (cela l'afficherait).
@@ -58,6 +58,7 @@
     padding: var(--space-2) var(--space-3);
     font-size: var(--text-sm);
     text-align: start;
+    text-decoration: none; /* l'élément peut être un lien (<a class="menu__item">) */
     border-radius: var(--radius-sm);
 
     &:hover,
@@ -120,24 +121,11 @@
     }
   }
 
-  /* ---------- Placement ancré (navigateurs compatibles) ---------- */
-  @supports (anchor-scope: all) and (position-area: top) {
-    .post {
-      anchor-scope: --post-menu, --reaction;
-    }
-
-    .post__more {
-      anchor-name: --post-menu;
-    }
-
-    .reaction__trigger {
-      anchor-name: --reaction;
-    }
-
-    .composer__emoji {
-      anchor-name: --composer-emoji;
-    }
-
+  /* ---------- Placement ancré (navigateurs compatibles) ----------
+   * Aucun nom d'ancre : un popover ouvert par <button popovertarget> a ce bouton pour
+   * ancre implicite. Les menus s'ouvrent dessous, les sélecteurs d'emojis dessus ;
+   * position-try-fallbacks les retourne s'ils manquent de place. */
+  @supports (position-area: top) {
     .menu,
     .emoji-picker {
       inset: auto;
@@ -153,19 +141,11 @@
     }
 
     .menu {
-      position-anchor: --post-menu;
       position-area: bottom span-left;
       transform-origin: top right;
     }
 
-    .reaction__picker {
-      position-anchor: --reaction;
-      position-area: top span-left;
-      transform-origin: bottom right;
-    }
-
-    .composer__emojis {
-      position-anchor: --composer-emoji;
+    .emoji-picker {
       position-area: top span-left;
       transform-origin: bottom right;
     }

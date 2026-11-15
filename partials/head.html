@@ -1,0 +1,33 @@
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#d4d2de" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0c0c11" media="(prefers-color-scheme: dark)">
+<link rel="icon" href="assets/images/brand/favicon.svg" type="image/svg+xml">
+
+<!-- Styles partagés. tokens.css doit rester en tête : il fixe l'ordre des cascade layers. -->
+<link rel="stylesheet" href="assets/css/fonts.css">
+<link rel="stylesheet" href="assets/css/tokens.css">
+<link rel="stylesheet" href="assets/css/base.css">
+<link rel="stylesheet" href="assets/css/layout.css">
+<link rel="stylesheet" href="assets/css/components/button.css">
+<link rel="stylesheet" href="assets/css/components/avatar.css">
+<link rel="stylesheet" href="assets/css/components/tag.css">
+<link rel="stylesheet" href="assets/css/components/card.css">
+<link rel="stylesheet" href="assets/css/components/page-header.css">
+<link rel="stylesheet" href="assets/css/components/section-title.css">
+<link rel="stylesheet" href="assets/css/components/forms.css">
+<link rel="stylesheet" href="assets/css/components/tabs.css">
+<link rel="stylesheet" href="assets/css/components/dialog.css">
+<link rel="stylesheet" href="assets/css/components/popover.css">
+<link rel="stylesheet" href="assets/css/components/topbar.css">
+<link rel="stylesheet" href="assets/css/components/sidebar.css">
+<link rel="stylesheet" href="assets/css/components/toast.css">
+<link rel="stylesheet" href="assets/css/utilities.css">
+
+<!-- Applique le thème mémorisé avant le premier affichage (évite un flash). -->
+<script>
+  try {
+    const theme = localStorage.getItem('postit-theme')
+    if (theme === 'light' || theme === 'dark') document.documentElement.dataset.theme = theme
+  } catch {}
+</script>
+<script src="assets/js/app.js" defer></script>

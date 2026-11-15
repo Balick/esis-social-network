@@ -1,0 +1,659 @@
+/*
+ * Page de profil (profil.html).
+ *
+ *   .profile-page       colonne centrale : en-tête du profil puis onglets (tabs.css)
+ *   .profile-hero       couverture, avatar à anneau, identité, faits, statistiques, actions.
+ *                       C'est un conteneur : sa mise en page suit SA largeur (container query),
+ *                       centrée quand il est étroit, en ligne quand il a de la place.
+ *   .profile-media      mosaïque de photos (onglet Médias), chaque vignette est un lien vers l'image
+ *   .profile-about      cartes de l'onglet À propos : .profile-info, tags, .profile-skill
+ *   .profile-friend     carte d'un ami (onglet Amis)
+ *   .profile-photos     mini-grille « Photos récentes » de la colonne de droite
+ *   .profile-edit       formulaire de la boîte « Modifier le profil » (dialog.css + forms.css)
+ *   .profile-lightbox   visionneuse de photos : un <dialog> natif ouvert par profile.js
+ */
+
+@layer components {
+  .profile-page {
+    display: grid;
+    gap: var(--space-6);
+    align-content: start;
+  }
+
+  .profile-page__more {
+    display: flex;
+    justify-content: center;
+    margin-block-start: var(--space-5);
+  }
+
+  /* ================= En-tête du profil ================= */
+  .profile-hero {
+    container: profile-hero / inline-size;
+    overflow: clip;
+    background-color: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+  }
+
+  .profile-hero__cover {
+    position: relative;
+
+    /* Largeur explicite : sinon min-block-size élargirait la couverture via aspect-ratio */
+    inline-size: 100%;
+    aspect-ratio: 3 / 1;
+    min-block-size: 7.5rem;
+    max-block-size: 15rem;
+    background-color: var(--tone-lilac);
+  }
+
+  .profile-hero__cover-image {
+    inline-size: 100%;
+    block-size: 100%;
+    object-fit: cover;
+  }
+
+  .profile-hero__cover-edit {
+    position: absolute;
+    inset-block-start: var(--space-3);
+    inset-inline-end: var(--space-3);
+    background-color: color-mix(in oklch, var(--color-surface) 75%, transparent);
+    border-color: transparent;
+    backdrop-filter: blur(6px);
+
+    &:hover {
+      background-color: var(--color-surface);
+    }
+  }
+
+  /* Étroit : tout est centré, l'un sous l'autre */
+  .profile-hero__body {
+    display: grid;
+    grid-template-areas:
+      'avatar'
+      'identity'
+      'bio'
+      'meta'
+      'stats'
+      'actions';
+    gap: var(--space-4);
+    justify-items: center;
+    padding: 0 var(--space-5) var(--space-5);
+    text-align: center;
+  }
+
+  /*
+   * Anneau dégradé façon logo : le dégradé occupe la bordure (border-box),
+   * un fond de surface remplit le padding, ce qui laisse un liseré clair autour de la photo.
+   */
+  .profile-hero__avatar {
+    --avatar-size: 7rem;
+
+    /* Au-dessus de la couverture, qu'il chevauche */
+    position: relative;
+    z-index: 1;
+    grid-area: avatar;
+    padding: 0.1875rem;
+    margin-block-start: calc(var(--avatar-size) / -2);
+    background:
+      linear-gradient(var(--color-surface), var(--color-surface)) padding-box,
+      linear-gradient(135deg, var(--tone-azure), var(--tone-violet) 55%, var(--tone-rose))
+        border-box;
+    border: 0.25rem solid transparent;
+    box-shadow:
+      0 0 0 0.25rem var(--color-surface),
+      var(--shadow-md);
+  }
+
+  .profile-hero__identity {
+    grid-area: identity;
+    min-inline-size: 0;
+  }
+
+  .profile-hero__name {
+    display: inline-flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+    align-items: center;
+    justify-content: center;
+    font-size: clamp(1.375rem, 1.2rem + 0.6vw, 1.75rem);
+    font-weight: var(--weight-bold);
+  }
+
+  .profile-hero__badge {
+    inline-size: 0.8em;
+    block-size: 0.8em;
+    color: var(--color-focus);
+  }
+
+  .profile-hero__handle {
+    font-size: var(--text-sm);
+    color: var(--color-text-muted);
+  }
+
+  .profile-hero__bio {
+    grid-area: bio;
+    max-inline-size: 60ch;
+  }
+
+  .profile-hero__meta {
+    display: flex;
+    flex-wrap: wrap;
+    grid-area: meta;
+    gap: var(--space-2) var(--space-5);
+    justify-content: center;
+    font-size: var(--text-sm);
+    color: var(--color-text-muted);
+  }
+
+  .profile-hero__fact {
+    display: inline-flex;
+    gap: var(--space-1);
+    align-items: center;
+
+    & .icon {
+      inline-size: 1.1em;
+      block-size: 1.1em;
+    }
+  }
+
+  .profile-hero__link {
+    font-weight: var(--weight-medium);
+    color: var(--color-mention);
+    text-decoration: none;
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+
+  .profile-hero__stats {
+    display: grid;
+    grid-area: stats;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: var(--space-2);
+    inline-size: 100%;
+  }
+
+  .profile-hero__stat {
+    display: grid;
+    gap: 0.125rem;
+    padding: var(--space-3) var(--space-2);
+    text-align: center;
+    background-color: var(--color-surface-muted);
+    border-radius: var(--radius-md);
+  }
+
+  /* Le chiffre (dd) s'affiche au-dessus du libellé (dt), qui le précède dans le HTML */
+  .profile-hero__stat-value {
+    order: -1;
+    font-size: var(--text-lg);
+    font-weight: var(--weight-bold);
+    line-height: var(--leading-tight);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .profile-hero__stat-label {
+    font-size: var(--text-xs);
+    color: var(--color-text-muted);
+  }
+
+  .profile-hero__actions {
+    display: flex;
+    flex-wrap: wrap;
+    grid-area: actions;
+    gap: var(--space-2);
+    justify-content: center;
+    inline-size: 100%;
+
+    & .button {
+      flex: 1 1 10rem;
+    }
+  }
+
+  /* Large : avatar à gauche et actions à droite sous la couverture, le reste aligné à gauche */
+  @container profile-hero (inline-size >= 34rem) {
+    .profile-hero__body {
+      grid-template-columns: auto minmax(0, 1fr);
+      grid-template-areas:
+        'avatar actions'
+        'identity identity'
+        'bio bio'
+        'meta meta'
+        'stats stats';
+      column-gap: var(--space-5);
+      justify-items: start;
+      padding-inline: var(--space-6);
+      text-align: start;
+    }
+
+    .profile-hero__avatar {
+      --avatar-size: 8.5rem;
+    }
+
+    .profile-hero__identity {
+      margin-block-start: calc(var(--space-2) * -1);
+    }
+
+    .profile-hero__name,
+    .profile-hero__meta {
+      justify-content: flex-start;
+    }
+
+    .profile-hero__actions {
+      justify-content: flex-end;
+      justify-self: end;
+      inline-size: auto;
+      margin-block-start: var(--space-4);
+
+      & .button {
+        flex: 0 0 auto;
+      }
+    }
+
+    /* Les statistiques gardent des tuiles compactes même sur une très large colonne */
+    .profile-hero__stats {
+      max-inline-size: 30rem;
+    }
+  }
+
+  /* ================= Onglet Publications ================= */
+  .profile-posts {
+    display: grid;
+    gap: var(--space-4);
+
+    & code {
+      padding: 0.1em 0.4em;
+      font-family: ui-monospace, 'Cascadia Code', Consolas, monospace;
+      font-size: 0.9em;
+      background-color: color-mix(in oklch, var(--color-surface) 70%, transparent);
+      border-radius: var(--radius-sm);
+    }
+  }
+
+  /* ================= Onglet Médias : mosaïque ================= */
+  .profile-media {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 8.5rem), 1fr));
+    grid-auto-flow: dense;
+    gap: var(--space-2);
+  }
+
+  /* La première photo est mise en avant (2 × 2 cases) */
+  .profile-media__item:first-child {
+    grid-row: span 2;
+    grid-column: span 2;
+  }
+
+  .profile-media__link,
+  .profile-photos__link {
+    display: block;
+    aspect-ratio: 1;
+    overflow: clip;
+    background-color: var(--color-surface-muted);
+    border-radius: var(--radius-md);
+
+    &:focus-visible {
+      outline-offset: 3px;
+    }
+  }
+
+  .profile-media__image,
+  .profile-photos__image {
+    inline-size: 100%;
+    block-size: 100%;
+    object-fit: cover;
+    transition:
+      scale var(--duration) var(--ease-out),
+      filter var(--duration) var(--ease-out);
+
+    :is(a:hover, a:focus-visible) > & {
+      scale: 1.06;
+      filter: saturate(1.15);
+    }
+  }
+
+  /* ================= Onglet À propos ================= */
+  .profile-about {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 16rem), 1fr));
+    gap: var(--space-4);
+  }
+
+  .profile-about__card--wide {
+    grid-column: 1 / -1;
+  }
+
+  .profile-about__tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+
+    & .tag {
+      min-block-size: 2rem;
+      padding-inline: var(--space-3);
+      font-size: var(--text-sm);
+    }
+  }
+
+  .profile-info {
+    display: grid;
+    gap: var(--space-3);
+    font-size: var(--text-sm);
+  }
+
+  .profile-info__row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-1) var(--space-4);
+    align-items: center;
+    justify-content: space-between;
+
+    & + & {
+      padding-block-start: var(--space-3);
+      border-block-start: 1px solid var(--color-border);
+    }
+  }
+
+  .profile-info__label {
+    display: inline-flex;
+    gap: var(--space-2);
+    align-items: center;
+    color: var(--color-text-muted);
+  }
+
+  .profile-info__value {
+    font-weight: var(--weight-medium);
+  }
+
+  .profile-skills {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 14rem), 1fr));
+    gap: var(--space-4) var(--space-8);
+  }
+
+  .profile-skill {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: var(--space-2) var(--space-3);
+    align-items: baseline;
+    font-size: var(--text-sm);
+  }
+
+  .profile-skill__name {
+    font-weight: var(--weight-medium);
+  }
+
+  .profile-skill__level {
+    font-size: var(--text-xs);
+    color: var(--color-text-muted);
+  }
+
+  /* Barre de niveau : la jauge se remplit jusqu'à --level (posé dans le HTML) */
+  .profile-skill__bar {
+    grid-column: 1 / -1;
+    block-size: 0.5rem;
+    overflow: clip;
+    background-color: var(--color-surface-muted);
+    border-radius: var(--radius-full);
+
+    &::before {
+      display: block;
+      inline-size: var(--level, 50%);
+      block-size: 100%;
+      content: '';
+      background: linear-gradient(90deg, var(--tone-azure), var(--tone-violet));
+      border-radius: inherit;
+      transform-origin: left;
+      animation: profile-skill-fill 800ms var(--ease-out) both;
+    }
+  }
+
+  @keyframes profile-skill-fill {
+    from {
+      scale: 0 1;
+    }
+  }
+
+  /* ================= Onglet Amis ================= */
+  .profile-friends {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 8rem), 1fr));
+    gap: var(--space-3);
+  }
+
+  .profile-friend {
+    display: grid;
+    gap: 0.125rem;
+    align-content: start;
+    justify-items: center;
+    block-size: 100%;
+    padding: var(--space-4) var(--space-3);
+    line-height: var(--leading-tight);
+    text-align: center;
+    text-decoration: none;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    transition:
+      background-color var(--duration-fast) var(--ease-out),
+      border-color var(--duration-fast) var(--ease-out);
+
+    &:hover {
+      background-color: var(--color-surface-muted);
+      border-color: transparent;
+    }
+  }
+
+  .profile-friend__avatar {
+    --avatar-size: 4rem;
+
+    margin-block-end: var(--space-2);
+  }
+
+  .profile-friend__name {
+    font-size: var(--text-sm);
+    font-weight: var(--weight-semibold);
+  }
+
+  .profile-friend__info {
+    font-size: var(--text-2xs);
+    color: var(--color-text-muted);
+  }
+
+  /* ================= Colonne de droite : photos récentes ================= */
+  .profile-photos__more {
+    display: inline-block;
+    margin-block-start: var(--space-4);
+    font-size: var(--text-xs);
+    color: var(--color-text-muted);
+    text-decoration: none;
+
+    &:hover {
+      color: var(--color-text);
+      text-decoration: underline;
+    }
+  }
+
+  .profile-photos__grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: var(--space-2);
+  }
+
+  .profile-photos__link {
+    border-radius: var(--radius-sm);
+  }
+
+  /* ================= Boîte « Modifier le profil » ================= */
+
+  /* Le formulaire enveloppe le corps et le pied : seul le corps défile */
+  .profile-edit {
+    display: flex;
+    flex: 1 1 auto;
+    flex-direction: column;
+    min-block-size: 0;
+  }
+
+  .profile-edit__photo {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-4);
+    align-items: center;
+
+    & > .field {
+      flex: 1 1 12rem;
+    }
+  }
+
+  .profile-edit__preview {
+    --avatar-size: 4.5rem;
+
+    box-shadow: 0 0 0 3px var(--color-surface-muted);
+  }
+
+  .profile-edit__upload {
+    justify-self: start;
+    cursor: pointer;
+
+    &:hover {
+      background-color: var(--color-surface-muted);
+    }
+
+    /* Le vrai champ fichier est masqué : son focus se reporte sur le libellé-bouton */
+    .profile-edit__photo:has(.profile-edit__file:focus-visible) & {
+      outline: 2px solid var(--color-focus);
+      outline-offset: 2px;
+    }
+  }
+
+  .profile-edit__file {
+    position: absolute;
+    inline-size: 1px;
+    block-size: 1px;
+    opacity: 0;
+  }
+
+  .profile-edit__counter {
+    justify-self: end;
+    font-variant-numeric: tabular-nums;
+
+    &[data-state='limit'] {
+      font-weight: var(--weight-medium);
+      color: var(--color-danger);
+    }
+  }
+
+  /* ================= Visionneuse de photos ================= */
+
+  /*
+   * La boîte épouse la photo : un clic en dehors touche le fond (::backdrop) et
+   * ferme la visionneuse (closedby="any"). Les boutons sont fixés aux bords de l'écran.
+   */
+  .profile-lightbox {
+    max-inline-size: 100%;
+    max-block-size: 100%;
+    padding: 0;
+    overflow: visible;
+    color: oklch(100% 0 0deg);
+    background: none;
+    border: 0;
+    opacity: 0;
+    transition:
+      opacity var(--duration) var(--ease-out),
+      display var(--duration) allow-discrete,
+      overlay var(--duration) allow-discrete;
+
+    &[open] {
+      opacity: 1;
+
+      @starting-style {
+        opacity: 0;
+      }
+    }
+
+    &::backdrop {
+      background-color: oklch(0% 0 0deg / 85%);
+      backdrop-filter: blur(8px);
+    }
+  }
+
+  .profile-lightbox__figure {
+    display: grid;
+    gap: var(--space-3);
+    justify-items: center;
+    transition: scale var(--duration) var(--ease-out);
+
+    .profile-lightbox:not([open]) & {
+      scale: 0.96;
+    }
+
+    @starting-style {
+      scale: 0.96;
+    }
+  }
+
+  .profile-lightbox__image {
+    inline-size: auto;
+    max-inline-size: min(100vw - 7rem, 64rem);
+    block-size: auto;
+    max-block-size: calc(100dvh - 8rem);
+    object-fit: contain;
+    background-color: oklch(100% 0 0deg / 8%);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-lg);
+
+    @media (width < 40rem) {
+      max-inline-size: calc(100vw - 2rem);
+    }
+  }
+
+  .profile-lightbox__caption {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-1) var(--space-3);
+    justify-content: center;
+    max-inline-size: 40rem;
+    padding-inline: var(--space-4);
+    font-size: var(--text-sm);
+    text-align: center;
+  }
+
+  .profile-lightbox__counter {
+    color: oklch(100% 0 0deg / 65%);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .profile-lightbox__close,
+  .profile-lightbox__nav {
+    position: fixed;
+    color: inherit;
+    background-color: oklch(0% 0 0deg / 40%);
+    border-color: oklch(100% 0 0deg / 35%);
+
+    &:hover {
+      background-color: oklch(100% 0 0deg / 18%);
+    }
+  }
+
+  .profile-lightbox__close {
+    inset-block-start: var(--space-4);
+    inset-inline-end: var(--space-4);
+  }
+
+  .profile-lightbox__nav {
+    inset-block-start: 50%;
+    translate: 0 -50%;
+
+    /* Sans JavaScript, il n'y a qu'une photo : on masque la navigation */
+    .profile-lightbox:not([data-count]) & {
+      display: none;
+    }
+  }
+
+  .profile-lightbox__nav--prev {
+    inset-inline-start: var(--space-4);
+  }
+
+  .profile-lightbox__nav--next {
+    inset-inline-end: var(--space-4);
+  }
+}

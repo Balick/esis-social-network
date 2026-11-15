@@ -1,0 +1,12 @@
+/*
+ * Titre de section (<h2 class="section-title">) : colonnes latérales,
+ * listes de cartes… Partagé par toutes les pages.
+ */
+
+@layer components {
+  .section-title {
+    margin-block-end: var(--space-4);
+    font-size: var(--text-xl);
+    font-weight: var(--weight-bold);
+  }
+}

@@ -1,0 +1,176 @@
+/*
+ * Lecteur de stories : une boîte de dialogue native, ouverte par feed.js.
+ * Barres de progression animées en CSS (pause au survol), navigation
+ * précédent/suivant par boutons ou flèches du clavier.
+ */
+
+@layer components {
+  .story-viewer {
+    --story-duration: 5s;
+
+    position: fixed;
+    inline-size: min(26rem, 100%);
+    block-size: min(46rem, 100dvh);
+    max-block-size: 100dvh;
+    padding: 0;
+    overflow: hidden;
+    color: oklch(100% 0 0deg);
+    background-color: oklch(15% 0 0deg);
+    border: 0;
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-lg);
+    opacity: 0;
+    scale: 0.94;
+    transition:
+      opacity var(--duration) var(--ease-out),
+      scale var(--duration) var(--ease-out),
+      display var(--duration) allow-discrete,
+      overlay var(--duration) allow-discrete;
+
+    &[open] {
+      opacity: 1;
+      scale: 1;
+
+      @starting-style {
+        opacity: 0;
+        scale: 0.94;
+      }
+    }
+
+    &::backdrop {
+      background-color: oklch(0% 0 0deg / 80%);
+      backdrop-filter: blur(8px);
+    }
+
+    @media (width < 30rem) {
+      border-radius: 0;
+    }
+  }
+
+  .story-viewer__image {
+    position: absolute;
+    inset: 0;
+    inline-size: 100%;
+    block-size: 100%;
+    object-fit: cover;
+  }
+
+  /* Voile en haut pour garder l'en-tête lisible sur une image claire */
+  .story-viewer__top {
+    position: absolute;
+    inset: 0 0 auto;
+    z-index: 1;
+    display: grid;
+    gap: var(--space-3);
+    padding: var(--space-3) var(--space-4) var(--space-8);
+    background: linear-gradient(oklch(0% 0 0deg / 55%), transparent);
+  }
+
+  .story-viewer__progress {
+    display: flex;
+    gap: var(--space-1);
+  }
+
+  .story-viewer__bar {
+    flex: 1;
+    block-size: 3px;
+    overflow: hidden;
+    background-color: oklch(100% 0 0deg / 35%);
+    border-radius: var(--radius-full);
+
+    &::after {
+      display: block;
+      block-size: 100%;
+      content: '';
+      background-color: oklch(100% 0 0deg);
+      transform-origin: left;
+      scale: 0 1;
+    }
+
+    &[data-state='done']::after {
+      scale: 1;
+    }
+
+    &[data-state='active']::after {
+      animation: story-progress var(--story-duration) linear forwards;
+    }
+
+    /* Pause tant que la souris est sur la story (ou que le doigt appuie) */
+    .story-viewer:is(:hover, :active) &[data-state='active']::after {
+      animation-play-state: paused;
+    }
+  }
+
+  @keyframes story-progress {
+    to {
+      scale: 1;
+    }
+  }
+
+  .story-viewer__header {
+    display: flex;
+    gap: var(--space-3);
+    align-items: center;
+  }
+
+  .story-viewer__avatar {
+    outline: 2px solid oklch(100% 0 0deg);
+  }
+
+  .story-viewer__name {
+    flex: 1;
+    font-size: var(--text-sm);
+    font-weight: var(--weight-semibold);
+    text-shadow: 0 1px 4px oklch(0% 0 0deg / 50%);
+  }
+
+  .story-viewer__close {
+    color: inherit;
+    border-color: oklch(100% 0 0deg / 50%);
+
+    &:hover {
+      background-color: oklch(100% 0 0deg / 15%);
+    }
+  }
+
+  /* Zones de navigation : moitié gauche / moitié droite de la story */
+  .story-viewer__nav {
+    position: absolute;
+    inset-block: 0;
+    z-index: 0;
+    display: grid;
+    align-items: center;
+    inline-size: 50%;
+    padding-inline: var(--space-3);
+    color: inherit;
+    opacity: 0;
+    transition: opacity var(--duration-fast) var(--ease-out);
+
+    &:hover,
+    &:focus-visible {
+      opacity: 1;
+    }
+
+    &:focus-visible {
+      outline-offset: -4px;
+    }
+
+    & .icon {
+      inline-size: 2.25rem;
+      block-size: 2.25rem;
+      padding: var(--space-2);
+      background-color: oklch(0% 0 0deg / 40%);
+      border-radius: 50%;
+    }
+  }
+
+  .story-viewer__nav--prev {
+    inset-inline-start: 0;
+    justify-items: start;
+  }
+
+  .story-viewer__nav--next {
+    inset-inline-end: 0;
+    justify-items: end;
+  }
+}

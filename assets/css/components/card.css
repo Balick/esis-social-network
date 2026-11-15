@@ -1,0 +1,55 @@
+/*
+ * Carte générique : un bloc de contenu posé sur la surface.
+ *   .card            fond de surface + bordure
+ *   .card--muted     fond gris doux, sans bordure
+ *   .card--tone      fond pastel via data-tone (comme les publications)
+ *   .card__header / .card__title / .card__body / .card__footer
+ */
+
+@layer components {
+  .card {
+    display: grid;
+    gap: var(--space-4);
+    align-content: start;
+    padding: var(--space-5);
+    background-color: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+  }
+
+  .card--muted {
+    background-color: var(--color-surface-muted);
+    border-color: transparent;
+  }
+
+  .card--tone {
+    background-color: var(--tone, var(--tone-sky));
+    border-color: transparent;
+  }
+
+  .card__header {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2) var(--space-4);
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .card__title {
+    font-size: var(--text-lg);
+    font-weight: var(--weight-semibold);
+  }
+
+  .card__subtitle {
+    font-size: var(--text-sm);
+    color: var(--color-text-muted);
+  }
+
+  .card__footer {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+    align-items: center;
+    justify-content: flex-end;
+  }
+}

@@ -18,6 +18,7 @@
 
     /* ---------- Typographie ---------- */
     --font-sans: lexend, system-ui, -apple-system, 'Segoe UI', roboto, sans-serif;
+    --font-mono: ui-monospace, 'Cascadia Code', 'SF Mono', consolas, monospace;
     --text-2xs: 0.6875rem; /* 11px */
     --text-xs: 0.75rem; /* 12px */
     --text-sm: 0.8125rem; /* 13px */
@@ -73,6 +74,12 @@
     --color-focus: light-dark(oklch(55% 0.2 275deg), oklch(75% 0.15 275deg));
     --color-online: oklch(72% 0.17 150deg);
 
+    /* États (formulaires, confirmations, zone de danger) */
+    --color-danger: light-dark(oklch(52% 0.2 25deg), oklch(74% 0.15 25deg));
+    --color-danger-soft: light-dark(oklch(95% 0.03 25deg), oklch(30% 0.07 25deg));
+    --color-success: light-dark(oklch(48% 0.12 155deg), oklch(78% 0.13 155deg));
+    --color-success-soft: light-dark(oklch(95% 0.04 155deg), oklch(29% 0.05 155deg));
+
     /* ---------- Tons pastel (cartes, tuiles, avatars) ---------- */
     --tone-sky: light-dark(oklch(93% 0.035 265deg), oklch(27% 0.04 265deg));
     --tone-cream: light-dark(oklch(96.5% 0.04 88deg), oklch(28% 0.035 80deg));
@@ -96,10 +103,10 @@
     --duration: 250ms;
 
     /* ---------- Mise en page ---------- */
-    --shell-max: 78rem;
-    --sidebar-width: 14.5rem;
-    --rail-width: 4.5rem;
-    --aside-width: 14.5rem;
+    --shell-max: 82rem;
+    --topbar-height: 4.25rem;
+    --sidebar-width: 15rem;
+    --aside-width: 16rem;
     --bottom-nav-height: 4.25rem;
   }
 

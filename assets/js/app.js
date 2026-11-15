@@ -1,16 +1,21 @@
 /*
- * Post it — améliorations progressives, en JavaScript « vanilla » (aucune dépendance).
+ * Post it — script commun à toutes les pages (JavaScript « vanilla », sans dépendance).
  *
- * La page fonctionne SANS ce fichier : filtres du fil, sondage, menus et sélecteurs
- * d'emojis (popover), stories… sont en HTML/CSS. Ce script ajoute seulement ce que
- * le CSS ne peut pas faire seul :
- *   1. choisir et mémoriser le thème clair/sombre ;
- *   2. « J'aime », réactions, « Suivre », actions du menu ;
- *   3. le compositeur : emojis, lieu, pièces jointes, publication ;
- *   4. un message (toast) pour les liens de démonstration sans page.
+ * Le site fonctionne SANS JavaScript : filtres, onglets, sondage, menus (popover),
+ * boîtes de dialogue (command/commandfor)… sont en HTML/CSS. Ce script ajoute
+ * seulement ce que le CSS ne peut pas faire seul :
+ *   1. le thème clair / sombre / système, mémorisé ;
+ *   2. les actions des boutons [data-action] (J'aime, réactions, Suivre, menus…) ;
+ *   3. les commentaires des publications ;
+ *   4. un repli pour les boîtes de dialogue et un toast pour les liens de démonstration ;
+ *   5. l'en-tête : notifications et recherche.
  *
- * C'est un script classique (et non un module ES) pour que le site marche aussi
- * en ouvrant index.html directement depuis le disque (file://).
+ * Chaque page peut ajouter ses propres actions dans son script (ex. feed.js) :
+ *   postit.register('mon-action', (bouton, événement) => { … })
+ *   <button type="button" data-action="mon-action">…</button>
+ *
+ * Scripts classiques (et non modules ES) pour que le site marche aussi en
+ * ouvrant les pages directement depuis le disque (file://).
  */
 
 ;(() => {
@@ -34,142 +39,222 @@
   }
 
   /* ------------------------------------------------------------------------
-   * 1. Thème clair / sombre
-   * Le choix est mémorisé ; sans choix, on suit le réglage du système.
+   * 1. Thème : « light », « dark » ou « system » (suit le réglage de l'appareil)
    * ---------------------------------------------------------------------- */
   const THEME_KEY = 'postit-theme'
   const themeSwitch = document.querySelector('.theme-switch')
+  const themeInputs = document.querySelectorAll('input[name="theme"]')
   const systemDark = matchMedia('(prefers-color-scheme: dark)')
 
+  const currentPreference = () => root.dataset.theme ?? 'system'
   const isDark = () => (root.dataset.theme ? root.dataset.theme === 'dark' : systemDark.matches)
 
-  const renderThemeSwitch = () => {
-    const dark = isDark()
-    themeSwitch.setAttribute('aria-checked', String(dark))
-    themeSwitch.querySelector('use').setAttribute('href', dark ? '#icon-sun' : '#icon-moon')
+  const renderTheme = () => {
+    if (themeSwitch) {
+      const dark = isDark()
+      themeSwitch.setAttribute('aria-checked', String(dark))
+      themeSwitch.querySelector('use').setAttribute('href', dark ? '#icon-sun' : '#icon-moon')
+    }
+    themeInputs.forEach((input) => {
+      input.checked = input.value === currentPreference()
+    })
   }
 
   const applyTheme = (theme) => {
-    root.dataset.theme = theme
-    try {
-      localStorage.setItem(THEME_KEY, theme)
-    } catch {
-      // Stockage indisponible (navigation privée…) : le thème vaut pour cette visite.
+    const update = () => {
+      if (theme === 'system') delete root.dataset.theme
+      else root.dataset.theme = theme
+      try {
+        if (theme === 'system') localStorage.removeItem(THEME_KEY)
+        else localStorage.setItem(THEME_KEY, theme)
+      } catch {
+        // Stockage indisponible (navigation privée…) : le thème vaut pour cette visite.
+      }
+      renderTheme()
     }
-    renderThemeSwitch()
+    // Fondu entre les deux thèmes là où l'API View Transitions existe.
+    if (document.startViewTransition && !prefersReducedMotion.matches) {
+      document.startViewTransition(update)
+    } else {
+      update()
+    }
   }
 
   if (themeSwitch) {
     themeSwitch.hidden = false
-    renderThemeSwitch()
-    systemDark.addEventListener('change', renderThemeSwitch)
-
-    themeSwitch.addEventListener('click', () => {
-      const next = isDark() ? 'light' : 'dark'
-      // Fondu entre les deux thèmes là où l'API View Transitions existe.
-      if (document.startViewTransition && !prefersReducedMotion.matches) {
-        document.startViewTransition(() => applyTheme(next))
-      } else {
-        applyTheme(next)
-      }
-    })
+    themeSwitch.addEventListener('click', () => applyTheme(isDark() ? 'light' : 'dark'))
   }
+  themeInputs.forEach((input) =>
+    input.addEventListener('change', () => input.checked && applyTheme(input.value)),
+  )
+  systemDark.addEventListener('change', renderTheme)
+  renderTheme()
 
   /* ------------------------------------------------------------------------
    * 2. Actions des boutons [data-action]
    * Un seul écouteur sur le document (délégation) : il fonctionne aussi pour
-   * les publications ajoutées plus tard par le compositeur.
+   * les éléments ajoutés plus tard (nouvelle publication, nouveau commentaire…).
    * ---------------------------------------------------------------------- */
   const closePopover = (element) => element.closest('[popover]')?.hidePopover()
+  const actions = new Map()
+  const register = (name, handler) => actions.set(name, handler)
 
-  const actions = {
-    like(button) {
-      const liked = button.getAttribute('aria-pressed') !== 'true'
-      button.setAttribute('aria-pressed', String(liked))
-      button.classList.remove('is-popping')
-      if (liked) {
-        void button.offsetWidth // relance l'animation CSS
-        button.classList.add('is-popping')
-      }
-    },
+  register('like', (button) => {
+    const liked = button.getAttribute('aria-pressed') !== 'true'
+    button.setAttribute('aria-pressed', String(liked))
+    button.classList.remove('is-popping')
+    if (liked) {
+      void button.offsetWidth // relance l'animation CSS
+      button.classList.add('is-popping')
+    }
+  })
 
-    react(button) {
-      const reaction = button.closest('.reaction')
-      const label = button.getAttribute('aria-label')
-      reaction.querySelector('.reaction__emoji').textContent = button.dataset.emoji
-      reaction.querySelector('.reaction__label').textContent = label
-      reaction.dataset.reacted = ''
-      closePopover(button)
-      reaction.querySelector('.reaction__trigger').focus()
-    },
+  register('react', (button) => {
+    const reaction = button.closest('.reaction')
+    reaction.querySelector('.reaction__emoji').textContent = button.dataset.emoji
+    reaction.querySelector('.reaction__label').textContent = button.getAttribute('aria-label')
+    reaction.dataset.reacted = ''
+    closePopover(button)
+    reaction.querySelector('.reaction__trigger').focus()
+  })
 
-    follow(button) {
-      const following = !button.hasAttribute('data-following')
-      const name = button.closest('.suggestion').querySelector('.suggestion__name').textContent
-      button.toggleAttribute('data-following', following)
-      button.querySelector('.suggestion__follow-label').textContent = following
-        ? 'Abonné·e'
-        : 'Suivre'
-      notify(following ? `Vous suivez ${name}` : `Vous ne suivez plus ${name}`)
-    },
+  // <button data-action="follow" data-name="Nicolas"><span data-follow-label>Suivre</span></button>
+  register('follow', (button) => {
+    const following = !button.hasAttribute('data-following')
+    const name = button.dataset.name ?? ''
+    button.toggleAttribute('data-following', following)
+    const label = button.querySelector('[data-follow-label]')
+    if (label) label.textContent = following ? 'Abonné·e' : 'Suivre'
+    notify(following ? `Vous suivez ${name}` : `Vous ne suivez plus ${name}`)
+  })
 
-    save(button) {
-      closePopover(button)
-      notify('Publication enregistrée')
-    },
+  register('save', (button) => {
+    closePopover(button)
+    notify('Publication enregistrée')
+  })
 
-    report(button) {
-      closePopover(button)
-      notify('Merci ! La publication a été signalée à la modération.')
-    },
+  register('report', (button) => {
+    closePopover(button)
+    notify('Merci ! La publication a été signalée à la modération.')
+  })
 
-    async 'copy-link'(button) {
-      const post = button.closest('.post')
-      const url = new URL(`#${post.id}`, location.href).href
-      closePopover(button)
-      try {
-        await navigator.clipboard.writeText(url)
-        notify('Lien copié dans le presse-papiers')
-      } catch {
-        notify('Impossible de copier le lien sur ce navigateur')
-      }
-    },
+  register('copy-link', async (button) => {
+    const target = button.closest('[id]')
+    const url = new URL(target ? `#${target.id}` : '', location.href).href
+    closePopover(button)
+    try {
+      await navigator.clipboard.writeText(url)
+      notify('Lien copié dans le presse-papiers')
+    } catch {
+      notify('Impossible de copier le lien sur ce navigateur')
+    }
+  })
 
-    'insert-emoji'(button) {
-      const input = document.querySelector('.composer__input')
-      input.setRangeText(button.textContent, input.selectionStart, input.selectionEnd, 'end')
-      closePopover(button)
-      input.focus()
-    },
+  // Simple message de confirmation : <button data-action="notify" data-message="…">
+  register('notify', (button) => {
+    closePopover(button)
+    notify(button.dataset.message ?? 'C’est noté !')
+  })
 
-    'toggle-location'(button) {
-      const active = button.getAttribute('aria-pressed') !== 'true'
-      button.setAttribute('aria-pressed', String(active))
-      renderAttachments()
-    },
+  /* ------------------------------------------------------------------------
+   * 3. Commentaires : <details class="comments"> sous chaque publication
+   * ---------------------------------------------------------------------- */
+  const ME = { name: 'Ben Uzan', avatar: 'assets/images/avatars/ben-uzan.webp' }
 
-    'remove-attachment'(button) {
-      const kind = button.dataset.kind
-      if (kind === 'location') {
-        document
-          .querySelector('[data-action="toggle-location"]')
-          .setAttribute('aria-pressed', 'false')
-      } else {
-        document.querySelector(`.composer [data-kind="${kind}"]`).value = ''
-      }
-      renderAttachments()
-      document.querySelector('.composer__input').focus()
-    },
+  const openComments = (comments) => {
+    if (!comments) return
+    const focusField = () => comments.querySelector('.comment-form__input')?.focus()
+    if (comments.open) return focusField()
+    // Le contenu d'un <details> ne devient focalisable qu'à l'image suivante après l'ouverture.
+    comments.addEventListener('toggle', () => requestAnimationFrame(focusField), { once: true })
+    comments.open = true
+  }
+
+  // Lien « Commenter » : ouvre la zone de commentaires et place le curseur.
+  register('comment', (link, event) => {
+    event.preventDefault()
+    openComments(link.closest('.post')?.querySelector('.comments'))
+  })
+
+  // « Répondre » : ouvre le champ pré-rempli avec la mention de l'auteur.
+  register('reply', (button) => {
+    const comments = button.closest('.comments')
+    const input = comments.querySelector('.comment-form__input')
+    const author = button.closest('.comment').querySelector('.comment__author').textContent
+    input.value = `@${author.split(' ')[0]} `
+    openComments(comments)
+  })
+
+  const pluralize = (count, word) => `${count} ${word}${count > 1 ? 's' : ''}`
+
+  document.addEventListener('submit', (event) => {
+    const form = event.target.closest('.comment-form')
+    if (!form) return
+    event.preventDefault()
+
+    const input = form.querySelector('.comment-form__input')
+    const text = input.value.trim()
+    if (!text) return input.focus()
+
+    const comments = form.closest('.comments')
+    const list = comments.querySelector('.comments__list')
+    const item = document.createElement('li')
+    item.className = 'comment'
+    item.innerHTML = `
+      <img class="avatar avatar--sm" src="${ME.avatar}" alt="" width="160" height="160">
+      <div class="comment__body">
+        <div class="comment__bubble">
+          <p class="comment__meta"><a class="comment__author" href="profil.html"></a><time>à l’instant</time></p>
+          <p class="comment__text"></p>
+        </div>
+        <div class="comment__actions">
+          <button class="comment__action" type="button" aria-pressed="false" data-action="like">J’aime</button>
+          <button class="comment__action" type="button" data-action="reply">Répondre</button>
+        </div>
+      </div>`
+    item.querySelector('.comment__author').textContent = ME.name
+    item.querySelector('.comment__text').textContent = text // textContent : aucun HTML injecté
+    item.querySelector('time').dateTime = new Date().toISOString()
+    list.append(item)
+
+    const count = list.children.length
+    const counter = comments.querySelector('.comments__count')
+    if (counter) counter.textContent = pluralize(count, 'commentaire')
+    form.reset()
+    input.focus()
+    notify('Commentaire publié')
+  })
+
+  /* ------------------------------------------------------------------------
+   * 4. Clics : actions, liens de démonstration, repli des boîtes de dialogue
+   * ---------------------------------------------------------------------- */
+
+  // Navigateurs sans Invoker Commands : on interprète command/commandfor nous-mêmes.
+  const supportsCommands = 'command' in HTMLButtonElement.prototype
+  const runCommand = (button) => {
+    const target = document.getElementById(button.getAttribute('commandfor'))
+    const command = button.getAttribute('command')
+    if (target instanceof HTMLDialogElement) {
+      if (command === 'show-modal') target.showModal()
+      if (command === 'close') target.close()
+    } else if (target?.popover !== undefined) {
+      if (command === 'toggle-popover') target.togglePopover()
+      if (command === 'show-popover') target.showPopover()
+      if (command === 'hide-popover') target.hidePopover()
+    }
   }
 
   document.addEventListener('click', (event) => {
+    const commandButton = !supportsCommands && event.target.closest('button[commandfor]')
+    if (commandButton) runCommand(commandButton)
+
     const trigger = event.target.closest('[data-action]')
     if (trigger) {
-      actions[trigger.dataset.action]?.(trigger, event)
+      actions.get(trigger.dataset.action)?.(trigger, event)
       return
     }
 
-    // Liens de démonstration (#profil, #messages…) : la page n'existe pas encore.
+    // Liens de démonstration (#profil, #application…) : la page n'existe pas.
     const link = event.target.closest('a[href^="#"]')
     if (link && link.hash.length > 1 && !document.getElementById(link.hash.slice(1))) {
       event.preventDefault()
@@ -178,136 +263,32 @@
   })
 
   /* ------------------------------------------------------------------------
-   * 3. Compositeur
+   * 5. En-tête : notifications et recherche
    * ---------------------------------------------------------------------- */
-  const composer = document.querySelector('.composer')
-  if (!composer) return
 
-  const input = composer.querySelector('.composer__input')
-  const audience = composer.querySelector('.composer__select')
-  const fileInput = composer.querySelector('[data-kind="file"]')
-  const imageInput = composer.querySelector('[data-kind="image"]')
-  const locationButton = composer.querySelector('[data-action="toggle-location"]')
-  const attachments = composer.querySelector('.composer__attachments')
-  const feedList = document.querySelector('.feed__list')
-  const template = document.getElementById('post-template')
-  const TONES = ['mint', 'sky', 'lilac', 'cream']
-  const LOCATION = 'Lubumbashi, RDC'
-  let imageUrl = ''
-  let postCount = 0
-
-  /** Petite pastille « pièce jointe » avec un bouton pour la retirer. */
-  const createChip = ({ kind, label, thumb }) => {
-    const item = document.createElement('li')
-    item.className = 'chip'
-    if (thumb) {
-      const img = document.createElement('img')
-      img.className = 'chip__thumb'
-      img.src = thumb
-      img.alt = ''
-      item.append(img)
-    }
-    const text = document.createElement('span')
-    text.className = 'chip__label'
-    text.textContent = label
-    const remove = document.createElement('button')
-    remove.type = 'button'
-    remove.className = 'chip__remove'
-    remove.dataset.action = 'remove-attachment'
-    remove.dataset.kind = kind
-    remove.setAttribute('aria-label', `Retirer « ${label} »`)
-    remove.innerHTML = '<svg class="icon" aria-hidden="true"><use href="#icon-x"></use></svg>'
-    item.append(text, remove)
-    return item
-  }
-
-  function renderAttachments() {
-    const file = fileInput.files[0]
-    const image = imageInput.files[0]
-
-    if (imageUrl && !image) URL.revokeObjectURL(imageUrl)
-    imageUrl = image ? imageUrl || URL.createObjectURL(image) : ''
-
-    const chips = []
-    if (image) chips.push(createChip({ kind: 'image', label: image.name, thumb: imageUrl }))
-    if (file) chips.push(createChip({ kind: 'file', label: file.name }))
-    if (locationButton.getAttribute('aria-pressed') === 'true') {
-      chips.push(createChip({ kind: 'location', label: LOCATION }))
-    }
-
-    attachments.replaceChildren(...chips)
-    attachments.hidden = chips.length === 0
-  }
-
-  fileInput.addEventListener('change', renderAttachments)
-  imageInput.addEventListener('change', () => {
-    if (imageUrl) URL.revokeObjectURL(imageUrl)
-    imageUrl = ''
-    renderAttachments()
+  // « Tout marquer comme lu » : retire les pastilles et met à jour le bouton
+  register('mark-all-read', (button) => {
+    const panel = button.closest('.notifications')
+    panel.querySelectorAll('[data-unread]').forEach((item) => item.removeAttribute('data-unread'))
+    panel.querySelectorAll('.notifications__unread').forEach((label) => label.remove())
+    const trigger = document.querySelector(`[popovertarget="${panel.id}"]`)
+    trigger?.querySelector('.badge')?.remove()
+    trigger?.setAttribute('aria-label', 'Notifications')
+    button.disabled = true
+    notify('Toutes les notifications sont lues')
   })
 
-  // Ctrl/Cmd + Entrée pour publier.
-  input.addEventListener('keydown', (event) => {
-    if (event.key === 'Enter' && (event.ctrlKey || event.metaKey)) composer.requestSubmit()
-  })
-
-  composer.addEventListener('submit', (event) => {
+  // Recherche de démonstration : il n'y a pas encore de page de résultats
+  document.querySelector('[data-search]')?.addEventListener('submit', (event) => {
     event.preventDefault()
-    const message = input.value.trim()
-    if (!message) {
-      input.value = ''
-      input.focus()
-      return
-    }
-
-    postCount += 1
-    const post = template.content.firstElementChild.cloneNode(true)
-    const id = `post-new-${postCount}`
-    post.id = id
-    post.dataset.tone = TONES[(postCount - 1) % TONES.length]
-    post.setAttribute('aria-labelledby', `${id}-author`)
-    post.querySelector('.post__author').id = `${id}-author`
-    post.querySelector('time').dateTime = new Date().toISOString()
-    post.querySelector('.post__text').textContent = message
-    post.querySelector('.post__audience').textContent =
-      `· ${audience.options[audience.selectedIndex].text}`
-
-    if (locationButton.getAttribute('aria-pressed') === 'true') {
-      post.querySelector('.post__place').hidden = false
-    }
-
-    const image = imageInput.files[0]
-    if (image) {
-      const gallery = post.querySelector('.gallery')
-      const img = gallery.querySelector('img')
-      img.src = imageUrl
-      img.alt = 'Image jointe à la publication'
-      img.removeAttribute('width')
-      img.removeAttribute('height')
-      gallery.hidden = false
-      imageUrl = '' // l'URL appartient désormais à la publication
-    }
-
-    const file = fileInput.files[0]
-    if (file) {
-      const fileRow = post.querySelector('.post__file')
-      fileRow.querySelector('span').textContent = file.name
-      fileRow.hidden = false
-    }
-
-    // La nouvelle publication doit être visible : on revient sur « Récents ».
-    const recent = document.querySelector('.feed-filter__input[value="recent"]')
-    if (recent) recent.checked = true
-
-    feedList.prepend(post)
-    composer.reset()
-    locationButton.setAttribute('aria-pressed', 'false')
-    renderAttachments()
-
-    post.scrollIntoView({
-      behavior: prefersReducedMotion.matches ? 'auto' : 'smooth',
-      block: 'center',
-    })
-    notify('Publication envoyée 🎉')
+    const query = event.target.elements.q.value.trim()
+    notify(
+      query
+        ? `La recherche « ${query} » arrive bientôt sur Post it ✨`
+        : 'Saisissez un nom, un sujet ou un #hashtag',
+    )
   })
+
+  // API publique pour les scripts de page (feed.js, messages.js…)
+  window.postit = Object.freeze({ notify, register, closePopover, prefersReducedMotion, ME })
 })()

@@ -1,0 +1,334 @@
+/*
+ * Formulaires : champs, cases, interrupteurs et messages d'erreur.
+ *
+ *   <div class="field">
+ *     <label class="field__label" for="email">E-mail</label>
+ *     <input class="input" id="email" type="email" required aria-describedby="email-hint">
+ *     <p class="field__hint" id="email-hint">Nous ne le partagerons jamais.</p>
+ *     <p class="field__error">Saisissez une adresse e-mail valide.</p>
+ *   </div>
+ *
+ * - Validation native : :user-invalid n'affiche l'erreur qu'APRÈS une saisie
+ *   (pas de champ rouge à l'ouverture de la page), sans JavaScript.
+ * - Interrupteur : <input type="checkbox" role="switch" class="switch">.
+ * - Cases et boutons radio : natifs, colorés via accent-color.
+ */
+
+@layer components {
+  .form {
+    display: grid;
+    gap: var(--space-5);
+  }
+
+  .form__row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 14rem), 1fr));
+    gap: var(--space-4);
+  }
+
+  /* ---------- Champ : libellé + contrôle + aide + erreur ---------- */
+  .field {
+    display: grid;
+    gap: var(--space-2);
+    align-content: start;
+  }
+
+  .field__label {
+    font-size: var(--text-sm);
+    font-weight: var(--weight-semibold);
+  }
+
+  .field__optional {
+    font-weight: var(--weight-regular);
+    color: var(--color-text-muted);
+  }
+
+  .field__hint {
+    font-size: var(--text-xs);
+    color: var(--color-text-muted);
+  }
+
+  .field__error {
+    display: none;
+    gap: var(--space-1);
+    align-items: center;
+    font-size: var(--text-xs);
+    font-weight: var(--weight-medium);
+    color: var(--color-danger);
+
+    .field:has(:user-invalid) & {
+      display: flex;
+    }
+  }
+
+  /* ---------- Contrôles texte ---------- */
+  .input,
+  .textarea,
+  .select {
+    inline-size: 100%;
+    min-block-size: 2.75rem;
+    padding: var(--space-2) var(--space-4);
+    color: var(--color-text);
+    background-color: var(--color-surface);
+    border: 1px solid var(--color-border-strong);
+    border-radius: var(--radius-md);
+    transition:
+      border-color var(--duration-fast) var(--ease-out),
+      box-shadow var(--duration-fast) var(--ease-out);
+
+    &::placeholder {
+      color: var(--color-text-muted);
+      opacity: 1;
+    }
+
+    &:hover {
+      border-color: color-mix(in oklch, var(--color-text) 35%, transparent);
+    }
+
+    &:focus-visible {
+      border-color: var(--color-focus);
+      outline: none;
+      box-shadow: 0 0 0 3px color-mix(in oklch, var(--color-focus) 30%, transparent);
+    }
+
+    &:user-invalid {
+      border-color: var(--color-danger);
+    }
+
+    &:disabled {
+      cursor: not-allowed;
+      background-color: var(--color-surface-muted);
+      opacity: 0.7;
+    }
+  }
+
+  .textarea {
+    min-block-size: 6rem;
+    max-block-size: 20rem;
+    line-height: var(--leading-normal);
+    resize: vertical;
+    field-sizing: content;
+  }
+
+  .select {
+    padding-inline-end: var(--space-10);
+    cursor: pointer;
+    appearance: none;
+
+    /* Flèche dessinée en CSS (deux dégradés), elle suit la couleur du texte */
+    background-image:
+      linear-gradient(45deg, transparent 50%, currentcolor 50%),
+      linear-gradient(135deg, currentcolor 50%, transparent 50%);
+    background-repeat: no-repeat;
+    background-position:
+      calc(100% - 1.25rem) 50%,
+      calc(100% - 0.9rem) 50%;
+    background-size: 0.35rem 0.35rem;
+  }
+
+  /* Champ avec icône à gauche (recherche, e-mail…) */
+  .input-group {
+    position: relative;
+
+    & > .icon {
+      position: absolute;
+      inset-block-start: 50%;
+      inset-inline-start: var(--space-4);
+      color: var(--color-text-muted);
+      pointer-events: none;
+      translate: 0 -50%;
+    }
+
+    & > .input {
+      padding-inline-start: 2.75rem;
+    }
+
+    /* Bouton dans le champ (afficher le mot de passe…) */
+    & > .icon-button {
+      position: absolute;
+      inset-block-start: 50%;
+      inset-inline-end: var(--space-1);
+      inline-size: 2.25rem;
+      color: var(--color-text-muted);
+      border: 0;
+      translate: 0 -50%;
+    }
+
+    &:has(> .icon-button) > .input {
+      padding-inline-end: 3rem;
+    }
+  }
+
+  .input--pill {
+    border-radius: var(--radius-full);
+  }
+
+  /* ---------- Cases à cocher et boutons radio ---------- */
+  .choice {
+    display: flex;
+    gap: var(--space-3);
+    align-items: flex-start;
+    font-size: var(--text-sm);
+    cursor: pointer;
+
+    & input {
+      flex-shrink: 0;
+      inline-size: 1.125rem;
+      block-size: 1.125rem;
+      margin: 0.15em 0 0;
+      accent-color: var(--color-inverse);
+      cursor: pointer;
+    }
+  }
+
+  .choice__text {
+    display: grid;
+    gap: 0.125rem;
+  }
+
+  .choice__hint {
+    font-size: var(--text-xs);
+    color: var(--color-text-muted);
+  }
+
+  /* Choix présentés en tuiles (ex. thème : Système / Clair / Sombre) */
+  .choice-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 9rem), 1fr));
+    gap: var(--space-3);
+  }
+
+  .choice-card {
+    position: relative;
+    display: grid;
+    gap: var(--space-2);
+    justify-items: center;
+    padding: var(--space-4);
+    font-size: var(--text-sm);
+    font-weight: var(--weight-medium);
+    text-align: center;
+    cursor: pointer;
+    border: 1px solid var(--color-border-strong);
+    border-radius: var(--radius-md);
+    transition:
+      border-color var(--duration-fast) var(--ease-out),
+      background-color var(--duration-fast) var(--ease-out);
+
+    &:hover {
+      background-color: var(--color-surface-muted);
+    }
+
+    &:has(:checked) {
+      background-color: var(--color-surface-muted);
+      border-color: var(--color-text);
+      box-shadow: inset 0 0 0 1px var(--color-text);
+    }
+
+    &:has(:focus-visible) {
+      outline: 2px solid var(--color-focus);
+      outline-offset: 2px;
+    }
+
+    & input {
+      position: absolute;
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    & .icon {
+      inline-size: 1.5rem;
+      block-size: 1.5rem;
+    }
+  }
+
+  /* ---------- Interrupteur ---------- */
+  .switch {
+    position: relative;
+    flex-shrink: 0;
+    inline-size: 2.5rem;
+    block-size: 1.5rem;
+    margin: 0;
+    cursor: pointer;
+    appearance: none;
+    background-color: var(--color-border);
+    border-radius: var(--radius-full);
+    transition: background-color var(--duration) var(--ease-out);
+
+    &::before {
+      position: absolute;
+      inset-block-start: 0.1875rem;
+      inset-inline-start: 0.1875rem;
+      inline-size: 1.125rem;
+      aspect-ratio: 1;
+      content: '';
+      background-color: var(--color-surface);
+      border-radius: 50%;
+      box-shadow: var(--shadow-sm);
+      transition: translate var(--duration) var(--ease-spring);
+    }
+
+    &:checked {
+      background-color: var(--color-inverse);
+
+      &::before {
+        translate: 1rem 0;
+      }
+    }
+
+    &:disabled {
+      cursor: not-allowed;
+      opacity: 0.5;
+    }
+  }
+
+  /* Ligne de réglage : texte à gauche, interrupteur à droite */
+  .setting {
+    display: flex;
+    gap: var(--space-4);
+    align-items: center;
+    justify-content: space-between;
+    padding-block: var(--space-3);
+
+    & + & {
+      border-block-start: 1px solid var(--color-border);
+    }
+  }
+
+  .setting__text {
+    display: grid;
+    gap: 0.125rem;
+    font-size: var(--text-sm);
+    font-weight: var(--weight-medium);
+  }
+
+  .setting__hint {
+    font-size: var(--text-xs);
+    font-weight: var(--weight-regular);
+    color: var(--color-text-muted);
+  }
+
+  /* ---------- Groupes et actions ---------- */
+  .fieldset {
+    display: grid;
+    gap: var(--space-3);
+    min-inline-size: 0;
+    padding: 0;
+    margin: 0;
+    border: 0;
+  }
+
+  .fieldset__legend {
+    padding: 0;
+    margin-block-end: var(--space-2);
+    font-size: var(--text-sm);
+    font-weight: var(--weight-semibold);
+  }
+
+  .form__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+    align-items: center;
+    justify-content: flex-end;
+  }
+}

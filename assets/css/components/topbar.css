@@ -1,0 +1,446 @@
+/*
+ * En-tête de l'application : logo, recherche, navigation principale, notifications,
+ * bouton de thème et menu du compte.
+ *
+ *   ≥ 80rem   logo + recherche | menus avec libellés | actions
+ *   ≥ 64rem   logo + recherche | menus en icônes      | actions
+ *   ≥ 48rem   logo             | menus en icônes      | actions   (collé en haut, effet verre)
+ *   < 48rem   logo | actions ; les menus deviennent une barre flottante en bas de l'écran
+ *
+ * Les libellés masqués restent lus par les lecteurs d'écran.
+ */
+
+@layer components {
+  .topbar {
+    position: relative;
+    z-index: 20;
+    background-color: var(--color-surface);
+    border-block-end: 1px solid var(--color-border);
+
+    /* Collé en haut. Pas sur mobile : backdrop-filter servirait de repère à la barre fixe du bas */
+    @media (width >= 48rem) {
+      position: sticky;
+      inset-block-start: 0;
+      background-color: color-mix(in oklch, var(--color-surface) 85%, transparent);
+      backdrop-filter: blur(1rem) saturate(1.4);
+    }
+  }
+
+  .topbar__inner {
+    display: flex;
+    gap: var(--space-3);
+    align-items: center;
+    justify-content: space-between;
+    max-inline-size: var(--shell-max);
+    min-block-size: var(--topbar-height);
+    padding-inline: var(--space-4);
+    margin-inline: auto;
+
+    /* Mêmes marges que .app : le logo s'aligne sur la colonne de gauche */
+    @media (width >= 48rem) {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+      gap: var(--space-4);
+      padding-inline: var(--space-6);
+    }
+
+    @media (width >= 80rem) {
+      padding-inline: var(--space-8);
+    }
+  }
+
+  .topbar__start {
+    display: flex;
+    gap: var(--space-5);
+    align-items: center;
+    min-inline-size: 0;
+  }
+
+  /* ---------- Logo ---------- */
+  .topbar__brand {
+    display: flex;
+    flex-shrink: 0;
+    gap: var(--space-2);
+    align-items: center;
+    font-size: var(--text-lg);
+    font-weight: var(--weight-bold);
+    text-decoration: none;
+    border-radius: var(--radius-md);
+  }
+
+  .topbar__logo {
+    inline-size: 2.5rem;
+    block-size: 2.5rem;
+    filter: drop-shadow(0 0.25rem 0.5rem var(--shadow-color));
+    transition: rotate var(--duration) var(--ease-spring);
+
+    .topbar__brand:hover & {
+      rotate: -8deg;
+    }
+  }
+
+  /* ---------- Recherche ---------- */
+  .topbar__search {
+    display: none;
+    flex: 1;
+    max-inline-size: 17rem;
+
+    @media (width >= 64rem) {
+      display: block;
+    }
+
+    /* Le bouton d'envoi n'apparaît qu'une fois un texte saisi */
+    &:not(:has(.input:not(:placeholder-shown))) .topbar__submit {
+      display: none;
+    }
+
+    & .input {
+      min-block-size: 2.5rem;
+      background-color: var(--color-surface-muted);
+      border-color: transparent;
+
+      &:hover {
+        border-color: var(--color-border-strong);
+      }
+    }
+  }
+
+  /* ---------- Navigation principale ---------- */
+  .nav__list {
+    display: flex;
+    gap: var(--space-1);
+  }
+
+  .nav__link {
+    position: relative;
+    display: flex;
+    gap: var(--space-2);
+    align-items: center;
+    justify-content: center;
+    min-inline-size: 2.75rem;
+    min-block-size: 2.75rem;
+    padding: var(--space-2) var(--space-3);
+    font-size: var(--text-sm);
+    font-weight: var(--weight-medium);
+    color: var(--color-text-muted);
+    text-decoration: none;
+    border-radius: var(--radius-full);
+    transition:
+      background-color var(--duration-fast) var(--ease-out),
+      color var(--duration-fast) var(--ease-out);
+
+    & .icon {
+      inline-size: 1.25rem;
+      block-size: 1.25rem;
+    }
+
+    &:hover {
+      color: var(--color-text);
+      background-color: var(--color-surface-muted);
+    }
+
+    &[aria-current='page'] {
+      color: var(--color-on-inverse);
+      background-color: var(--color-inverse);
+    }
+  }
+
+  /* Libellés visibles seulement quand la place le permet */
+  .nav__label {
+    @media (width < 80rem) {
+      position: absolute;
+      inline-size: 1px;
+      block-size: 1px;
+      overflow: hidden;
+      white-space: nowrap;
+      clip-path: inset(50%);
+    }
+  }
+
+  .badge {
+    display: inline-grid;
+    place-items: center;
+    min-inline-size: 1.25rem;
+    block-size: 1.25rem;
+    padding-inline: 0.3125rem;
+    font-size: var(--text-2xs);
+    font-weight: var(--weight-semibold);
+    line-height: 1;
+    color: var(--color-on-inverse);
+    background-color: var(--color-accent-text);
+    border-radius: var(--radius-full);
+
+    [aria-current='page'] > & {
+      color: var(--color-inverse);
+      background-color: var(--color-on-inverse);
+    }
+
+    /* Icône seule : la pastille se pose sur le coin de l'icône */
+    @media (width < 80rem) {
+      position: absolute;
+      inset-block-start: 0.125rem;
+      inset-inline-end: 0.125rem;
+      min-inline-size: 1.125rem;
+      block-size: 1.125rem;
+      padding-inline: 0.25rem;
+      font-size: 0.625rem;
+      outline: 2px solid var(--color-surface);
+    }
+  }
+
+  /* ---------- Actions ---------- */
+  .topbar__actions {
+    display: flex;
+    gap: var(--space-2);
+    align-items: center;
+    justify-content: flex-end;
+  }
+
+  .topbar__button {
+    position: relative;
+    border-color: var(--color-border);
+  }
+
+  .topbar__badge {
+    position: absolute;
+    inset-block-start: -0.25rem;
+    inset-inline-end: -0.25rem;
+    min-inline-size: 1.125rem;
+    block-size: 1.125rem;
+    padding-inline: 0.25rem;
+    font-size: 0.625rem;
+    outline: 2px solid var(--color-surface);
+  }
+
+  /* Bouton de thème (role="switch") : icône lune / soleil, changée par app.js */
+  .theme-switch {
+    display: inline-grid;
+    flex-shrink: 0;
+    place-items: center;
+    inline-size: 2.5rem;
+    aspect-ratio: 1;
+    border: 1px solid var(--color-border);
+    border-radius: 50%;
+    transition: background-color var(--duration-fast) var(--ease-out);
+
+    &:hover {
+      background-color: var(--color-surface-muted);
+    }
+  }
+
+  .topbar__account {
+    display: flex;
+    flex-shrink: 0;
+    gap: var(--space-1);
+    align-items: center;
+    padding: 0.1875rem;
+    padding-inline-end: var(--space-2);
+    color: var(--color-text-muted);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-full);
+    transition: background-color var(--duration-fast) var(--ease-out);
+
+    &:hover,
+    &:has(+ :popover-open) {
+      background-color: var(--color-surface-muted);
+    }
+
+    /* Page « Mon profil » ou « Paramètres » ouverte : le menu du compte est actif */
+    &:has(+ .topbar__menu [aria-current='page']) {
+      border-color: var(--color-text);
+    }
+
+    & .icon {
+      inline-size: 0.875rem;
+      block-size: 0.875rem;
+    }
+  }
+
+  .topbar__avatar {
+    --avatar-size: 2.125rem;
+  }
+
+  /* ---------- Menu du compte ---------- */
+  .topbar__menu {
+    min-inline-size: 15rem;
+
+    & [aria-current='page'] {
+      font-weight: var(--weight-semibold);
+      background-color: var(--color-surface-muted);
+    }
+  }
+
+  .topbar__me {
+    display: flex;
+    gap: var(--space-3);
+    align-items: center;
+    padding: var(--space-3);
+    margin-block-end: var(--space-1);
+    text-decoration: none;
+    border-block-end: 1px solid var(--color-border);
+    border-radius: var(--radius-sm) var(--radius-sm) 0 0;
+
+    &:hover .topbar__me-name {
+      text-decoration: underline;
+    }
+  }
+
+  .topbar__me-text {
+    display: grid;
+  }
+
+  .topbar__me-name {
+    font-weight: var(--weight-semibold);
+  }
+
+  .topbar__me-handle {
+    font-size: var(--text-xs);
+    color: var(--color-text-muted);
+  }
+
+  /* ---------- Panneau des notifications ---------- */
+  .notifications {
+    inline-size: min(23rem, 100vw - 2rem);
+    padding: var(--space-2);
+
+    /* Mobile : pleine largeur sous l'en-tête, plutôt qu'ancré au bouton */
+    @media (width < 48rem) {
+      position-area: none;
+      inset: calc(var(--topbar-height) - var(--space-2)) var(--space-3) auto;
+      inline-size: auto;
+      margin: 0;
+    }
+  }
+
+  .notifications__header {
+    display: flex;
+    gap: var(--space-3);
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--space-2) var(--space-3);
+  }
+
+  .notifications__title {
+    font-weight: var(--weight-semibold);
+  }
+
+  .notifications__read {
+    font-size: var(--text-xs);
+    color: var(--color-text-muted);
+    border-radius: var(--radius-sm);
+
+    &:hover {
+      color: var(--color-text);
+      text-decoration: underline;
+    }
+
+    &:disabled {
+      cursor: default;
+      opacity: 0.5;
+      text-decoration: none;
+    }
+  }
+
+  .notifications__list {
+    display: grid;
+    gap: 0.125rem;
+  }
+
+  .notifications__item {
+    position: relative;
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    gap: var(--space-3);
+    align-items: start;
+    padding: var(--space-2) var(--space-6) var(--space-2) var(--space-3);
+    font-size: var(--text-sm);
+    line-height: var(--leading-tight);
+    text-decoration: none;
+    border-radius: var(--radius-sm);
+
+    &:hover,
+    &:focus-visible {
+      background-color: var(--color-surface-muted);
+    }
+
+    & strong {
+      font-weight: var(--weight-semibold);
+    }
+
+    /* Non lue : fond teinté et pastille */
+    &[data-unread] {
+      background-color: color-mix(in oklch, var(--tone-sky) 55%, transparent);
+
+      &::after {
+        position: absolute;
+        inset-block-start: 50%;
+        inset-inline-end: var(--space-3);
+        inline-size: 0.5rem;
+        aspect-ratio: 1;
+        content: '';
+        background-color: var(--color-focus);
+        border-radius: 50%;
+        translate: 0 -50%;
+      }
+    }
+  }
+
+  .notifications__text {
+    display: grid;
+    gap: var(--space-1);
+  }
+
+  .notifications__time {
+    font-size: var(--text-xs);
+    color: var(--color-text-muted);
+  }
+
+  .notifications__all {
+    display: block;
+    padding: var(--space-3);
+    margin-block-start: var(--space-1);
+    font-size: var(--text-sm);
+    font-weight: var(--weight-medium);
+    text-align: center;
+    text-decoration: none;
+    border-block-start: 1px solid var(--color-border);
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+
+  /* ---------- Mobile : menus dans une barre flottante en bas de l'écran ---------- */
+  @media (width < 48rem) {
+    .topbar__name {
+      font-size: var(--text-md);
+    }
+
+    .nav {
+      position: fixed;
+      inset-block-end: calc(var(--space-3) + env(safe-area-inset-bottom));
+      inset-inline: var(--space-3);
+      z-index: 10;
+      padding: var(--space-2);
+      background-color: color-mix(in oklch, var(--color-surface) 82%, transparent);
+      backdrop-filter: blur(1rem) saturate(1.4);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-lg);
+    }
+
+    .nav__list {
+      display: grid;
+      grid-auto-columns: 1fr;
+      grid-auto-flow: column;
+    }
+
+    .nav__link {
+      border-radius: var(--radius-md);
+    }
+
+    .nav__link > .badge {
+      inset-inline-end: calc(50% - 1.375rem);
+    }
+  }
+}

@@ -27,6 +27,10 @@ Les personnes représentées sont des modèles photo : les noms affichés dans l
 | `assets/images/avatars/nicolas-shabani.webp`     | [photo-1507003211169](https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d) |
 | `assets/images/avatars/olivier-ngoy.webp`        | [photo-1531384441138](https://images.unsplash.com/photo-1531384441138-2736e62e0919) |
 | `assets/images/avatars/sarah-kalala.webp`        | [photo-1523824921871](https://images.unsplash.com/photo-1523824921871-d6f1a15151f1) |
+| `assets/images/covers/ben-uzan.webp`             | [photo-1547471080](https://images.unsplash.com/photo-1547471080-7cc2caa01a7e)       |
+| `assets/images/events/birthday-balloons.webp`    | [photo-1530103862676](https://images.unsplash.com/photo-1530103862676-de8c9debad1d) |
+| `assets/images/events/concert.webp`              | [photo-1470229722913](https://images.unsplash.com/photo-1470229722913-7c0e2dbbafd3) |
+| `assets/images/events/cooking-class.webp`        | [photo-1556910103](https://images.unsplash.com/photo-1556910103-1c02745aae4d)       |
 | `assets/images/posts/hackathon.webp`             | [photo-1531482615713](https://images.unsplash.com/photo-1531482615713-2afd69097998) |
 | `assets/images/posts/hike-friends.webp`          | [photo-1551632811](https://images.unsplash.com/photo-1551632811-561732d1e306)       |
 | `assets/images/posts/snowy-peak.webp`            | [photo-1454496522488](https://images.unsplash.com/photo-1454496522488-7a8e488e8606) |

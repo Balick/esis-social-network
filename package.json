@@ -16,9 +16,11 @@
   },
   "scripts": {
     "dev": "serve .",
-    "lint": "npm run lint:css && npm run lint:html && npm run lint:format",
+    "sync": "node scripts/sync-partials.mjs",
+    "lint": "npm run lint:sync && npm run lint:css && npm run lint:html && npm run lint:format",
+    "lint:sync": "node scripts/sync-partials.mjs --check",
     "lint:css": "stylelint \"assets/css/**/*.css\"",
-    "lint:html": "html-validate index.html",
+    "lint:html": "html-validate \"*.html\"",
     "lint:format": "prettier --check .",
     "format": "prettier --write ."
   },
