@@ -1,8 +1,8 @@
 # Contribuer à Post it
 
 Merci de vouloir améliorer Post it ! Ce projet est une vitrine de HTML et de CSS modernes : chaque
-contribution compte, de la correction d'une faute de frappe à un nouveau composant. En participant,
-vous acceptez de respecter le [code de conduite](CODE_OF_CONDUCT.md).
+contribution compte, de la correction d'une faute de frappe à un nouveau composant. Merci de rester
+courtois et bienveillant dans les échanges.
 
 ## Prérequis
 

@@ -3,6 +3,3 @@ contact_links:
   - name: Guide de contribution
     url: https://github.com/Balick/esiss-social-web-site/blob/main/CONTRIBUTING.md
     about: Conventions, recettes et checklist avant d'ouvrir une pull request.
-  - name: Code de conduite
-    url: https://github.com/Balick/esiss-social-web-site/blob/main/CODE_OF_CONDUCT.md
-    about: Les règles de respect qui s'appliquent à tous les échanges.
