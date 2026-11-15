@@ -3,19 +3,19 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Post it — le réseau social des étudiants de l'ESIS</title>
+    <title>Post it — réseau social open source</title>
     <meta
       name="description"
-      content="Post it, le réseau social des étudiants de l'ESIS : fil d'actualité, stories, forums et vie du campus. Une interface en HTML et CSS modernes, sans framework."
+      content="Post it, une interface de réseau social open source : fil d'actualité, stories, messages et suggestions. En HTML et CSS modernes, sans framework."
     >
     <meta name="color-scheme" content="light dark">
     <meta name="theme-color" content="#d4d2de" media="(prefers-color-scheme: light)">
     <meta name="theme-color" content="#0c0c11" media="(prefers-color-scheme: dark)">
     <meta property="og:type" content="website">
-    <meta property="og:title" content="Post it — le réseau social des étudiants de l'ESIS">
+    <meta property="og:title" content="Post it — réseau social open source">
     <meta
       property="og:description"
-      content="Fil d'actualité, stories et vie du campus : une interface en HTML et CSS modernes, sans framework."
+      content="Fil d'actualité, stories et suggestions : une interface de réseau social en HTML et CSS modernes, sans framework."
     >
     <link rel="icon" href="assets/images/brand/favicon.svg" type="image/svg+xml">
 
@@ -102,7 +102,7 @@
     </svg>
 
     <div class="app">
-      <h1 class="visually-hidden">Post it, le réseau social des étudiants de l'ESIS</h1>
+      <h1 class="visually-hidden">Post it, réseau social open source</h1>
 
       <!-- Avatars flottants décoratifs autour de l'application (grands écrans uniquement) -->
       <div class="app__decor" aria-hidden="true">
@@ -319,7 +319,7 @@
             </header>
 
             <p class="post__text">
-              J'ai pris un café incroyable aujourd'hui à la cafèt' du campus : un latte au lait de coco 🥥…
+              J'ai pris un café incroyable aujourd'hui au petit café du coin : un latte au lait de coco 🥥…
               délicieux, vraiment trop bon !!! 😋 Allez le goûter avant qu'il n'y en ait plus.
             </p>
 
@@ -359,7 +359,7 @@
             <header class="post__header">
               <span class="avatar avatar--initials" data-tone="violet" aria-hidden="true">CD</span>
               <div class="post__byline">
-                <h3 class="post__author" id="post-3-author"><a href="#club-dev">Club Dev ESIS</a></h3>
+                <h3 class="post__author" id="post-3-author"><a href="#club-dev">Club Dev</a></h3>
                 <p class="post__meta"><time datetime="2026-11-14T05:30">il y a 5 heures</time></p>
               </div>
               <button class="icon-button post__more" type="button" popovertarget="post-3-menu" aria-label="Options de la publication">
@@ -387,14 +387,14 @@
             </header>
 
             <p class="post__text">
-              🚀 Hackathon ESIS ce samedi ! 24 heures pour construire une application utile au campus.
+              🚀 Hackathon ce samedi ! 24 heures pour construire une application utile à toute la communauté.
               Équipes de 3 à 5, inscriptions ouvertes jusqu'à jeudi soir.
               <a class="hashtag" href="#hackathon">#hackathon</a>
-              <a class="hashtag" href="#esis">#esis</a>
+              <a class="hashtag" href="#opensource">#opensource</a>
             </p>
 
             <div class="gallery" data-count="1">
-              <img class="gallery__item" src="assets/images/posts/hackathon.webp" alt="Des étudiantes et étudiants concentrés, en train de coder sur leurs ordinateurs portables" width="1200" height="675" loading="lazy" decoding="async">
+              <img class="gallery__item" src="assets/images/posts/hackathon.webp" alt="Une équipe concentrée, en train de coder sur des ordinateurs portables" width="1200" height="675" loading="lazy" decoding="async">
             </div>
 
             <footer class="post__footer">
@@ -460,23 +460,23 @@
               </div>
             </header>
 
-            <p class="post__text">Révisions pour l'examen d'algorithmique : on se retrouve où ? 📚</p>
+            <p class="post__text">Session de code du week-end : on se retrouve où ? 💻</p>
 
             <!-- Les résultats apparaissent dès qu'une option est cochée (:has(:checked)). -->
             <fieldset class="poll">
-              <legend class="visually-hidden">Sondage : lieu des révisions</legend>
+              <legend class="visually-hidden">Sondage : lieu de la session de code</legend>
               <label class="poll__option" style="--votes: 64%">
-                <input class="poll__input" type="radio" name="poll-revisions" value="library">
+                <input class="poll__input" type="radio" name="poll-session" value="library">
                 <span class="poll__label">À la bibliothèque</span>
                 <span class="poll__result">64 %</span>
               </label>
               <label class="poll__option" style="--votes: 27%">
-                <input class="poll__input" type="radio" name="poll-revisions" value="online">
+                <input class="poll__input" type="radio" name="poll-session" value="online">
                 <span class="poll__label">En ligne, en visio</span>
                 <span class="poll__result">27 %</span>
               </label>
               <label class="poll__option" style="--votes: 9%">
-                <input class="poll__input" type="radio" name="poll-revisions" value="home">
+                <input class="poll__input" type="radio" name="poll-session" value="home">
                 <span class="poll__label">Chacun chez soi</span>
                 <span class="poll__result">9 %</span>
               </label>
@@ -627,7 +627,7 @@
               <img class="avatar avatar--md suggestion__avatar" data-tone="rose" src="assets/images/avatars/nicolas-shabani.webp" alt="" width="160" height="160">
               <p class="suggestion__body">
                 <span class="suggestion__name">Nicolas Shabani</span>
-                <span class="suggestion__info">L3 Réseaux</span>
+                <span class="suggestion__info">12 amis en commun</span>
               </p>
               <button class="button button--small suggestion__follow" type="button" data-action="follow">
                 <svg class="icon" aria-hidden="true"><use href="#icon-check"></use></svg>
@@ -638,7 +638,7 @@
               <img class="avatar avatar--md suggestion__avatar" data-tone="sun" src="assets/images/avatars/brigitte-lando.webp" alt="" width="160" height="160">
               <p class="suggestion__body">
                 <span class="suggestion__name">Brigitte Lando</span>
-                <span class="suggestion__info">L2 Génie logiciel</span>
+                <span class="suggestion__info">5 amis en commun</span>
               </p>
               <button class="button button--small suggestion__follow" type="button" data-action="follow">
                 <svg class="icon" aria-hidden="true"><use href="#icon-check"></use></svg>
@@ -649,7 +649,7 @@
               <img class="avatar avatar--md suggestion__avatar" data-tone="azure" src="assets/images/avatars/ivan-chenko.webp" alt="" width="160" height="160">
               <p class="suggestion__body">
                 <span class="suggestion__name">Ivan Chenko</span>
-                <span class="suggestion__info">Master IA</span>
+                <span class="suggestion__info">Suggéré pour vous</span>
               </p>
               <button class="button button--small suggestion__follow" type="button" data-action="follow">
                 <svg class="icon" aria-hidden="true"><use href="#icon-check"></use></svg>
@@ -705,7 +705,7 @@
             <p class="post__meta">
               <time>à l'instant</time>
               <span class="post__place" hidden>
-                · <svg class="icon" aria-hidden="true"><use href="#icon-map-pin"></use></svg>Campus ESIS, Lubumbashi
+                · <svg class="icon" aria-hidden="true"><use href="#icon-map-pin"></use></svg>Lubumbashi, RDC
               </span>
               <span class="post__audience"></span>
             </p>
