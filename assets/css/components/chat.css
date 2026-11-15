@@ -1,0 +1,697 @@
+/*
+ * Messagerie (messages.html) : liste des conversations + conversation ouverte.
+ *
+ *   .messenger            <main> en deux volets (liste | conversation)
+ *   .conversation         une ligne de la liste (lien, aria-current="true" si ouverte)
+ *   .presence             avatar avec pastille « en ligne » (data-online)
+ *   .chat                 une conversation : en-tête, fil (role="log"), une seule visible à la fois
+ *   .message-group        messages consécutifs d'une même personne (--sent : les miens)
+ *   .message              une bulle (--media : photo, --file : pièce jointe)
+ *   .typing               indicateur « en train d'écrire » (trois points animés)
+ *   .chat-form            zone de saisie en bas de la conversation
+ *
+ * Mise en page :
+ *   ≥ 64rem   les deux volets côte à côte, hauteur fixe, chacun défile indépendamment ;
+ *   < 64rem   un seul volet à la fois selon data-view="list" | "chat" (posé par messages.js).
+ *             Sans JS, les volets s'empilent simplement et :target choisit la conversation.
+ */
+
+@layer components {
+  /* Hauteur fixe sur bureau : la marge de .app ne doit pas « traverser » <body> (marges
+   * fusionnées), sinon la page dépasse l'écran de 2.5rem */
+  body:has(> .app > .messenger) {
+    display: flow-root;
+  }
+
+  /* ---------- Les deux volets ---------- */
+  .messenger {
+    display: grid;
+    gap: var(--space-6);
+    align-content: start;
+
+    /* Petit écran avec JS : un volet à la fois */
+    @media (width < 64rem) {
+      &[data-view='list'] .messenger__chat,
+      &[data-view='chat'] .messenger__list {
+        display: none;
+      }
+    }
+
+    /* Grand écran : hauteur fixe, remplit l'écran (moins les marges de .app) */
+    @media (width >= 64rem) {
+      grid-template-columns: minmax(15rem, 19rem) minmax(0, 1fr);
+      align-content: stretch;
+      block-size: calc(100dvh - 2 * var(--app-padding));
+      min-block-size: 34rem;
+    }
+
+    /* Bureau : l'application est une carte posée avec une marge en haut et en bas */
+    @media (width >= 80rem) {
+      block-size: calc(100dvh - 2 * var(--app-padding) - 2 * var(--space-10));
+      max-block-size: 62rem;
+    }
+  }
+
+  .messenger__list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+    min-block-size: 0;
+  }
+
+  .messenger__conversations {
+    display: grid;
+    gap: var(--space-1);
+    align-content: start;
+
+    @media (width >= 64rem) {
+      position: relative;
+      flex: 1;
+      min-block-size: 0;
+      overflow-y: auto;
+      overscroll-behavior: contain;
+      scrollbar-width: thin;
+    }
+  }
+
+  .messenger__empty {
+    padding: var(--space-6) var(--space-3);
+    font-size: var(--text-sm);
+    color: var(--color-text-muted);
+    text-align: center;
+  }
+
+  .messenger__chat {
+    display: flex;
+    flex-direction: column;
+    min-inline-size: 0;
+
+    @media (width >= 64rem) {
+      min-block-size: 0;
+      background-color: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-lg);
+    }
+  }
+
+  /* ---------- Une ligne de la liste ---------- */
+  .conversation {
+    --presence-ring: var(--color-surface);
+
+    display: grid;
+    grid-template-areas:
+      'avatar name time'
+      'avatar preview unread';
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    gap: 0.125rem var(--space-3);
+    align-items: center;
+    padding: var(--space-3);
+    color: inherit;
+    text-decoration: none;
+    border-radius: var(--radius-md);
+    transition: background-color var(--duration-fast) var(--ease-out);
+
+    &:hover {
+      background-color: color-mix(in oklch, var(--color-surface-muted) 60%, transparent);
+    }
+
+    /* La liste défile : l'anneau de focus reste à l'intérieur pour ne pas être rogné */
+    &:focus-visible {
+      outline-offset: -2px;
+    }
+
+    &[aria-current='true'] {
+      --presence-ring: var(--color-surface-muted);
+
+      background-color: var(--color-surface-muted);
+    }
+
+    & .presence {
+      grid-area: avatar;
+    }
+  }
+
+  .conversation__name {
+    grid-area: name;
+    overflow: hidden;
+    font-size: var(--text-sm);
+    font-weight: var(--weight-semibold);
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .conversation__time {
+    grid-area: time;
+    font-size: var(--text-2xs);
+    color: var(--color-text-muted);
+    white-space: nowrap;
+  }
+
+  .conversation__preview {
+    grid-area: preview;
+    overflow: hidden;
+    font-size: var(--text-xs);
+    color: var(--color-text-muted);
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .conversation__unread {
+    display: inline-grid;
+    grid-area: unread;
+    place-items: center;
+    justify-self: end;
+    min-inline-size: 1.25rem;
+    block-size: 1.25rem;
+    padding-inline: 0.375rem;
+    font-size: var(--text-2xs);
+    font-weight: var(--weight-semibold);
+    line-height: 1;
+    color: var(--color-on-inverse);
+    background-color: var(--color-inverse);
+    border-radius: var(--radius-full);
+  }
+
+  /* Messages non lus : la ligne ressort */
+  .conversation:has(.conversation__unread) {
+    & .conversation__name {
+      font-weight: var(--weight-bold);
+    }
+
+    & .conversation__preview,
+    & .conversation__time {
+      font-weight: var(--weight-medium);
+      color: var(--color-text);
+    }
+  }
+
+  /* ---------- Avatar + pastille « en ligne » ---------- */
+  .presence {
+    position: relative;
+    display: inline-grid;
+    flex-shrink: 0;
+
+    &[data-online]::after {
+      position: absolute;
+      inset-block-end: 0;
+      inset-inline-end: 0;
+      inline-size: 0.75rem;
+      aspect-ratio: 1;
+      content: '';
+      background-color: var(--color-online);
+      border-radius: 50%;
+      box-shadow: 0 0 0 2px var(--presence-ring, var(--color-surface));
+    }
+  }
+
+  /* ---------- Une conversation ---------- */
+  .chat {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    min-block-size: 0;
+
+    /* Une seule conversation visible : celle qui porte data-active (posé par messages.js) */
+    &:not([data-active]) {
+      display: none;
+    }
+  }
+
+  /* Sans JS : un lien #conversation-… affiche la conversation visée (:target) */
+  .messenger:not([data-view]):has(.chat:target) {
+    & .chat {
+      display: none;
+    }
+
+    & .chat:target {
+      display: flex;
+    }
+  }
+
+  .chat__header {
+    display: flex;
+    gap: var(--space-3);
+    align-items: center;
+    padding: var(--space-3) var(--space-4);
+    border-block-end: 1px solid var(--color-border);
+
+    /* Petit écran : l'en-tête reste visible pendant que la page défile */
+    @media (width < 64rem) {
+      position: sticky;
+      inset-block-start: 0;
+      z-index: 4;
+      padding-inline: 0;
+      background-color: var(--color-surface);
+    }
+  }
+
+  .chat__back {
+    @media (width >= 64rem) {
+      display: none;
+    }
+  }
+
+  .chat__person {
+    flex: 1;
+    min-inline-size: 0;
+  }
+
+  .chat__name {
+    overflow: hidden;
+    font-size: var(--text-md);
+    font-weight: var(--weight-semibold);
+    text-overflow: ellipsis;
+    white-space: nowrap;
+
+    &:focus:not(:focus-visible) {
+      outline: none;
+    }
+  }
+
+  .chat__status {
+    display: flex;
+    gap: var(--space-1);
+    align-items: center;
+    font-size: var(--text-xs);
+    color: var(--color-text-muted);
+
+    &[data-online] {
+      color: var(--color-success);
+    }
+  }
+
+  .chat__actions {
+    display: flex;
+    gap: var(--space-1);
+
+    /* Très petit écran : boutons plus compacts, sans contour */
+    @media (width < 30rem) {
+      gap: 0;
+
+      & .icon-button {
+        inline-size: 2.25rem;
+        border: 0;
+      }
+    }
+  }
+
+  /* ---------- Fil des messages ---------- */
+  .chat__thread {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+    padding-block: var(--space-5);
+
+    @media (width >= 64rem) {
+      /* position: les textes .visually-hidden (absolus) restent dans la zone qui défile */
+      position: relative;
+      flex: 1;
+      min-block-size: 0;
+      padding: var(--space-5);
+      overflow-y: auto;
+      overscroll-behavior: contain;
+      scrollbar-width: thin;
+    }
+  }
+
+  .chat__messages {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+
+    /* Fil court : les messages se calent en bas, comme dans toute messagerie */
+    margin-block-start: auto;
+  }
+
+  /* Séparateur de jour (« Hier », « Aujourd'hui ») */
+  .chat__day {
+    display: flex;
+    gap: var(--space-3);
+    align-items: center;
+    font-size: var(--text-2xs);
+    font-weight: var(--weight-semibold);
+    color: var(--color-text-muted);
+
+    &::before,
+    &::after {
+      flex: 1;
+      block-size: 1px;
+      content: '';
+      background-color: var(--color-border);
+    }
+  }
+
+  /* ---------- Groupe de messages consécutifs ---------- */
+  .message-group {
+    display: flex;
+    gap: var(--space-2);
+    align-items: flex-end;
+    max-inline-size: min(34rem, 85%);
+  }
+
+  .message-group--sent {
+    align-self: flex-end;
+  }
+
+  /* Avatar aligné sur la dernière bulle (au-dessus de l'heure) */
+  .message-group__avatar {
+    margin-block-end: var(--space-5);
+  }
+
+  .message-group__stack {
+    display: flex;
+    flex-direction: column;
+    gap: 0.125rem;
+    align-items: flex-start;
+    min-inline-size: 0;
+
+    .message-group--sent & {
+      align-items: flex-end;
+    }
+  }
+
+  .message-group__author {
+    padding-inline: var(--space-3);
+    font-size: var(--text-2xs);
+    font-weight: var(--weight-medium);
+    color: var(--color-text-muted);
+  }
+
+  .message-group__meta {
+    display: flex;
+    gap: var(--space-1);
+    align-items: center;
+    block-size: var(--space-4);
+    margin-block-start: 0.125rem;
+    padding-inline: var(--space-2);
+    font-size: var(--text-2xs);
+    color: var(--color-text-muted);
+  }
+
+  /* Accusé de lecture : ✓✓ coloré quand c'est lu, ✓ gris quand c'est seulement envoyé */
+  .message-group__receipt {
+    color: var(--color-mention);
+
+    [data-status='sent'] > & {
+      color: var(--color-text-muted);
+    }
+  }
+
+  /* ---------- Bulle ---------- */
+  .message {
+    --corner-top: var(--radius-lg);
+    --corner-bottom: var(--radius-lg);
+
+    position: relative;
+    max-inline-size: 100%;
+    padding: var(--space-2) var(--space-4);
+    font-size: var(--text-md);
+    line-height: 1.45;
+    white-space: pre-line;
+    overflow-wrap: anywhere;
+    background-color: var(--color-surface-muted);
+    border-radius: var(--radius-lg);
+    border-start-start-radius: var(--corner-top);
+    border-end-start-radius: var(--corner-bottom);
+
+    /* Bulles reliées : les coins côté avatar se resserrent */
+    &:has(+ .message) {
+      --corner-bottom: calc(var(--radius-sm) / 2);
+    }
+
+    & + & {
+      --corner-top: calc(var(--radius-sm) / 2);
+    }
+
+    /* Une réaction déborde sous la bulle : on lui laisse la place */
+    &:has(.message__reaction) {
+      margin-block-end: var(--space-4);
+    }
+  }
+
+  /* Mes messages : couleurs inversées, groupés côté droit */
+  .message-group--sent .message {
+    color: var(--color-on-inverse);
+    background-color: var(--color-inverse);
+    border-radius: var(--radius-lg);
+    border-start-end-radius: var(--corner-top);
+    border-end-end-radius: var(--corner-bottom);
+  }
+
+  .message--media {
+    inline-size: min(13rem, 100%);
+    padding: 0;
+    overflow: hidden;
+    white-space: normal;
+    background: none;
+  }
+
+  .message__image {
+    inline-size: 100%;
+    block-size: auto;
+    object-fit: cover;
+  }
+
+  .message--file {
+    display: flex;
+    gap: var(--space-2);
+    align-items: center;
+    font-weight: var(--weight-medium);
+  }
+
+  .message__reaction {
+    position: absolute;
+    inset-block-end: calc(var(--space-3) * -1);
+    inset-inline-end: var(--space-2);
+    display: inline-grid;
+    place-items: center;
+    min-inline-size: 1.625rem;
+    block-size: 1.625rem;
+    padding-inline: var(--space-1);
+    font-size: var(--text-xs);
+    line-height: 1;
+    background-color: var(--color-surface-raised);
+    border: 2px solid var(--color-surface);
+    border-radius: var(--radius-full);
+    box-shadow: var(--shadow-sm);
+
+    .message-group--sent & {
+      inset-inline: var(--space-2) auto;
+    }
+  }
+
+  /* Messages ajoutés par messages.js : légère entrée en fondu */
+  .chat__messages > [data-new],
+  .message[data-new] {
+    transition:
+      opacity var(--duration) var(--ease-out),
+      translate var(--duration) var(--ease-out);
+
+    @starting-style {
+      opacity: 0;
+      translate: 0 0.5rem;
+    }
+  }
+
+  /* ---------- Indicateur « en train d'écrire » ---------- */
+  .typing {
+    display: flex;
+    gap: var(--space-2);
+    align-items: flex-end;
+  }
+
+  .typing__bubble {
+    display: inline-flex;
+    gap: var(--space-1);
+    align-items: center;
+    padding: var(--space-3) var(--space-4);
+    background-color: var(--color-surface-muted);
+    border-radius: var(--radius-lg);
+    border-end-start-radius: calc(var(--radius-sm) / 2);
+  }
+
+  .typing__dot {
+    inline-size: 0.4375rem;
+    aspect-ratio: 1;
+    background-color: var(--color-text-muted);
+    border-radius: 50%;
+    animation: typing calc(var(--duration) * 5) var(--ease-out) infinite;
+
+    &:nth-child(2) {
+      animation-delay: var(--duration-fast);
+    }
+
+    &:nth-child(3) {
+      animation-delay: calc(var(--duration-fast) * 2);
+    }
+
+    /* Mouvement réduit : trois points fixes */
+    @media (prefers-reduced-motion: reduce) {
+      opacity: 0.6;
+      animation: none;
+    }
+  }
+
+  @keyframes typing {
+    0%,
+    60%,
+    100% {
+      opacity: 0.35;
+      translate: 0 0;
+    }
+
+    30% {
+      opacity: 1;
+      translate: 0 -0.25rem;
+    }
+  }
+
+  /* ---------- Zone de saisie ---------- */
+  .chat-form {
+    --chat-field: var(--color-surface-muted);
+
+    display: grid;
+    gap: var(--space-2);
+    padding: var(--space-3) var(--space-4);
+    border-block-start: 1px solid var(--color-border);
+
+    /* Petit écran : carte flottante collée en bas, comme le compositeur du fil */
+    @media (width < 64rem) {
+      --chat-field: var(--color-surface);
+
+      position: sticky;
+      inset-block-end: var(--space-4);
+      z-index: 5;
+      padding: var(--space-3);
+      background-color: var(--color-surface-muted);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-lg);
+    }
+
+    /* Mobile : au-dessus de la barre de navigation du bas */
+    @media (width < 48rem) {
+      inset-block-end: calc(
+        var(--bottom-nav-height) + var(--space-5) + env(safe-area-inset-bottom)
+      );
+    }
+  }
+
+  .chat-form__attachments {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+  }
+
+  .chat-form__row {
+    display: flex;
+    gap: var(--space-2);
+    align-items: flex-end;
+  }
+
+  .chat-form__attach,
+  .chat-form__send {
+    inline-size: 2.75rem;
+    border: 0;
+  }
+
+  .chat-form__attach {
+    color: var(--color-text-muted);
+    cursor: pointer;
+
+    &:hover {
+      color: var(--color-text);
+      background-color: var(--chat-field);
+    }
+
+    /* Le champ fichier est masqué : l'anneau de focus se reporte sur son libellé */
+    &:has(:focus-visible) {
+      outline: 2px solid var(--color-focus);
+      outline-offset: 2px;
+    }
+  }
+
+  .chat-form__field {
+    display: flex;
+    flex: 1;
+    gap: var(--space-1);
+    align-items: flex-end;
+    min-inline-size: 0;
+    padding: var(--space-1) var(--space-1) var(--space-1) var(--space-4);
+    background-color: var(--chat-field);
+    border-radius: var(--radius-lg);
+
+    &:focus-within {
+      outline: 2px solid var(--color-focus);
+      outline-offset: 2px;
+    }
+  }
+
+  /* Le champ grandit avec le texte (field-sizing), jusqu'à 8 lignes */
+  .chat-form__input {
+    flex: 1;
+    min-inline-size: 0;
+    min-block-size: 2.25rem;
+    max-block-size: 8lh;
+    padding-block: calc((2.25rem - 1lh) / 2);
+    line-height: 1.45;
+    resize: none;
+    field-sizing: content;
+    background: none;
+    border: 0;
+
+    &:focus {
+      outline: none;
+    }
+
+    &::placeholder {
+      color: var(--color-text-muted);
+      opacity: 1;
+    }
+  }
+
+  .chat-form__emoji {
+    inline-size: 2.25rem;
+    color: var(--color-text-muted);
+    border: 0;
+
+    &:hover {
+      color: var(--color-text);
+      background-color: var(--color-surface);
+    }
+  }
+
+  .chat-form__send {
+    color: var(--color-on-inverse);
+    background-color: var(--color-inverse);
+    transition:
+      background-color var(--duration-fast) var(--ease-out),
+      opacity var(--duration-fast) var(--ease-out),
+      scale var(--duration-fast) var(--ease-out);
+
+    &:hover {
+      background-color: color-mix(in oklch, var(--color-inverse) 82%, var(--color-accent));
+    }
+
+    &:active {
+      scale: 0.94;
+    }
+
+    /* Rien à envoyer (ni texte ni pièce jointe) : le bouton paraît inactif */
+    .chat-form:has(.chat-form__input:placeholder-shown):not(:has(.chip)) & {
+      opacity: 0.5;
+    }
+  }
+
+  .chat-form__hint {
+    padding-inline: calc(2.75rem + var(--space-2) + var(--space-4));
+    font-size: var(--text-2xs);
+    color: var(--color-text-muted);
+
+    /* Écrans tactiles ou étroits : l'astuce clavier n'est pas affichée (elle reste lue
+     * par les lecteurs d'écran via aria-describedby) */
+    @media (hover: none), (width < 48rem) {
+      display: none;
+    }
+  }
+}
