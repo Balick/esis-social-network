@@ -3,13 +3,13 @@
   "private": true,
   "description": "Post it, une interface de réseau social open source : vitrine HTML/CSS moderne, sans framework ni étape de build.",
   "license": "MIT",
-  "homepage": "https://balick.github.io/esiss-social-web-site/",
+  "homepage": "https://balick.github.io/post-it/",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Balick/esiss-social-web-site.git"
+    "url": "git+https://github.com/Balick/post-it.git"
   },
   "bugs": {
-    "url": "https://github.com/Balick/esiss-social-web-site/issues"
+    "url": "https://github.com/Balick/post-it/issues"
   },
   "engines": {
     "node": "^22.22.2 || >=24.15.0"

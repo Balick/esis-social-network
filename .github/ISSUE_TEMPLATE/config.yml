@@ -1,5 +1,5 @@
 blank_issues_enabled: false
 contact_links:
   - name: Guide de contribution
-    url: https://github.com/Balick/esiss-social-web-site/blob/main/CONTRIBUTING.md
+    url: https://github.com/Balick/post-it/blob/main/CONTRIBUTING.md
     about: Conventions, recettes et checklist avant d'ouvrir une pull request.

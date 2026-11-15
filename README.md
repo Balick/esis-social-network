@@ -5,15 +5,15 @@
 **Une interface de réseau social open source** — vitrine HTML/CSS moderne,
 sans framework ni étape de build.
 
-[![CI](https://github.com/Balick/esiss-social-web-site/actions/workflows/ci.yml/badge.svg)](https://github.com/Balick/esiss-social-web-site/actions/workflows/ci.yml)
+[![CI](https://github.com/Balick/post-it/actions/workflows/ci.yml/badge.svg)](https://github.com/Balick/post-it/actions/workflows/ci.yml)
 [![Licence MIT](https://img.shields.io/badge/licence-MIT-blue)](LICENSE)
 ![Sans framework](https://img.shields.io/badge/sans_framework-z%C3%A9ro_d%C3%A9pendance-2ea44f)
 ![HTML5](https://img.shields.io/badge/HTML5-s%C3%A9mantique-e34f26?logo=html5&logoColor=white)
 ![CSS3](https://img.shields.io/badge/CSS3-moderne-663399?logo=css&logoColor=white)
 
-[**Voir la démo**](https://balick.github.io/esiss-social-web-site/) ·
+[**Voir la démo**](https://balick.github.io/post-it/) ·
 [Contribuer](CONTRIBUTING.md) ·
-[Signaler un bug](https://github.com/Balick/esiss-social-web-site/issues/new/choose)
+[Signaler un bug](https://github.com/Balick/post-it/issues/new/choose)
 
 </div>
 
@@ -29,7 +29,7 @@ quelques lignes de JavaScript facultatives. Le projet est ouvert à tous : serve
 comme terrain d'apprentissage ou comme référence.
 
 > [!NOTE]
-> La [démo en ligne](https://balick.github.io/esiss-social-web-site/) est active dès que GitHub
+> La [démo en ligne](https://balick.github.io/post-it/) est active dès que GitHub
 > Pages est activé sur le dépôt (**Settings → Pages → Source : « GitHub Actions »**). Le workflow
 > `pages.yml` la redéploie ensuite à chaque push sur `main`.
 
@@ -72,8 +72,8 @@ Aucune installation n'est nécessaire pour voir le site. Au choix :
 `npm install` ne sert qu'aux outils de qualité (Node.js 22.22 ou plus récent) :
 
 ```bash
-git clone https://github.com/Balick/esiss-social-web-site.git
-cd esiss-social-web-site
+git clone https://github.com/Balick/post-it.git
+cd post-it
 npm install
 npm run lint     # stylelint + html-validate + prettier
 npm run dev      # serveur local (équivaut à npx serve .)
