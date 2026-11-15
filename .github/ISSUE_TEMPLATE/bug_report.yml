@@ -1,0 +1,46 @@
+name: Signaler un bug
+description: Quelque chose ne s'affiche pas ou ne fonctionne pas comme prévu.
+title: 'fix: '
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Merci de prendre le temps de signaler un problème ! Vérifiez d'abord qu'il n'a pas déjà été signalé.
+  - type: textarea
+    id: description
+    attributes:
+      label: Description
+      description: Que se passe-t-il ? Qu'attendiez-vous à la place ?
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Étapes pour reproduire
+      placeholder: |
+        1. Ouvrir la page en mode sombre
+        2. Réduire la fenêtre à 360 px
+        3. Cliquer sur…
+    validations:
+      required: true
+  - type: input
+    id: browser
+    attributes:
+      label: Navigateur et système
+      placeholder: Chrome 142 sur Android 15, Safari 26 sur iOS…
+    validations:
+      required: true
+  - type: dropdown
+    id: theme
+    attributes:
+      label: Thème
+      options:
+        - Clair
+        - Sombre
+        - Les deux
+  - type: textarea
+    id: screenshots
+    attributes:
+      label: Captures d'écran
+      description: Glissez-déposez une image si cela aide à comprendre.
