@@ -2,8 +2,8 @@
 
 # Post it
 
-**Le réseau social étudiant de l'ESIS** — refonte 2026 d'un projet étudiant de 2022,
-vitrine HTML/CSS moderne, sans framework ni étape de build.
+**Une interface de réseau social open source** — vitrine HTML/CSS moderne,
+sans framework ni étape de build.
 
 [![CI](https://github.com/Balick/esiss-social-web-site/actions/workflows/ci.yml/badge.svg)](https://github.com/Balick/esiss-social-web-site/actions/workflows/ci.yml)
 [![Licence MIT](https://img.shields.io/badge/licence-MIT-blue)](LICENSE)
@@ -22,11 +22,11 @@ vitrine HTML/CSS moderne, sans framework ni étape de build.
   <img src="docs/screenshot-light.webp" alt="Interface de Post it : menu latéral, fil d'actualité avec publications colorées, stories, suggestions et recommandations">
 </picture>
 
-Né en 2022 comme projet étudiant « pour le fun » à l'ESIS (École Supérieure d'Informatique Salama,
-Lubumbashi, RDC), **Post it** a été entièrement repensé en 2026 pour montrer tout ce que le HTML et
-le CSS savent faire seuls aujourd'hui. Pas de React, pas de bundler, pas de dépendance à
-l'exécution : un fichier `index.html`, des feuilles de style et quelques lignes de JavaScript
-facultatives.
+**Post it** est l'interface d'un réseau social — fil d'actualité, stories, réactions, suggestions —
+pensée pour montrer tout ce que le HTML et le CSS savent faire seuls aujourd'hui. Pas de React, pas
+de bundler, pas de dépendance à l'exécution : un fichier `index.html`, des feuilles de style et
+quelques lignes de JavaScript facultatives. Le projet est ouvert à tous : servez-vous-en comme base,
+comme terrain d'apprentissage ou comme référence.
 
 > [!NOTE]
 > La [démo en ligne](https://balick.github.io/esiss-social-web-site/) est active dès que GitHub
@@ -125,9 +125,9 @@ fonctionnel.
 
 ## Contribuer
 
-Les contributions sont les bienvenues, en particulier celles des étudiant·e·s de l'ESIS ! Lisez le
-[guide de contribution](CONTRIBUTING.md) (conventions, recettes, checklist) et le
-[code de conduite](CODE_OF_CONDUCT.md) avant d'ouvrir une pull request.
+Les contributions sont les bienvenues, quel que soit votre niveau ! Lisez le
+[guide de contribution](CONTRIBUTING.md) (conventions, recettes, checklist) avant d'ouvrir une pull
+request.
 
 ## Crédits
 
@@ -144,9 +144,8 @@ photos, icônes et polices restent sous leur propre licence (voir [CREDITS.md](C
 
 ### English summary
 
-**Post it** is a student social network mock-up for ESIS (Lubumbashi, DR Congo), first built in
-2022 and fully redesigned in 2026 as a **modern HTML/CSS showcase**: no framework, no build step,
-no runtime dependency. It features a feed filterable without JavaScript (`:has()`), popovers with
+**Post it** is an open-source social network interface built as a **modern HTML/CSS showcase**:
+no framework, no build step, no runtime dependency. It features a feed filterable without JavaScript (`:has()`), popovers with
 CSS anchor positioning, cascade layers, OKLCH colors with `light-dark()`, container queries and a
 pure-CSS poll. Open `index.html` in any evergreen browser, or run `npx serve .`. Contributions are
 welcome — see [CONTRIBUTING.md](CONTRIBUTING.md) (in French). Code licensed under MIT.

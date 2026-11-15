@@ -53,6 +53,6 @@ sous [licence MIT](assets/icons/LICENSE-phosphor.txt).
 
 ## Design
 
-Mise en page inspirée d'un concept de tableau de bord social publié sur Dribbble, adaptée au
-contexte étudiant et entièrement réécrite à la main (HTML et CSS, sans framework). Le logo
+Mise en page inspirée d'un concept de tableau de bord social publié sur Dribbble, adaptée et
+entièrement réécrite à la main (HTML et CSS, sans framework). Le logo
 « Post it » et les illustrations CSS sont originaux.

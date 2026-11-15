@@ -1,7 +1,7 @@
 {
-  "name": "post-it-esis",
+  "name": "post-it",
   "private": true,
-  "description": "Post it, le réseau social étudiant de l'ESIS : vitrine HTML/CSS moderne, sans framework ni étape de build.",
+  "description": "Post it, une interface de réseau social open source : vitrine HTML/CSS moderne, sans framework ni étape de build.",
   "license": "MIT",
   "homepage": "https://balick.github.io/esiss-social-web-site/",
   "repository": {
