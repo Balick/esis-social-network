@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <title>Post it</title>
+  <defs>
+    <linearGradient id="a" x1="6" y1="5" x2="60" y2="60" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#5eead4"/>
+      <stop offset=".5" stop-color="#818cf8"/>
+      <stop offset="1" stop-color="#f472b6"/>
+    </linearGradient>
+    <radialGradient id="b" cx="50" cy="12" r="26" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#fde68a"/>
+      <stop offset="1" stop-color="#fde68a" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <path fill="url(#a)" d="M33 5c14.9 0 27 10.6 27 25.5S47.9 56 33 56c-3.1 0-6-.5-8.8-1.3l-11.6 4.9a1.6 1.6 0 0 1-2.2-1.9l3-9.8C8.4 43.3 6 37.2 6 30.5 6 15.6 18.1 5 33 5Z"/>
+  <path fill="url(#b)" d="M33 5c14.9 0 27 10.6 27 25.5S47.9 56 33 56c-3.1 0-6-.5-8.8-1.3l-11.6 4.9a1.6 1.6 0 0 1-2.2-1.9l3-9.8C8.4 43.3 6 37.2 6 30.5 6 15.6 18.1 5 33 5Z"/>
+  <path fill="#fff" d="M25 19h16a4 4 0 0 1 4 4v10l-9 9H25a4 4 0 0 1-4-4V23a4 4 0 0 1 4-4Z"/>
+  <path fill="#fff" fill-opacity=".55" d="M45 33h-6a3 3 0 0 0-3 3v6Z"/>
+</svg>
