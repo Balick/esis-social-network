@@ -192,7 +192,7 @@
   const feedList = document.querySelector('.feed__list')
   const template = document.getElementById('post-template')
   const TONES = ['mint', 'sky', 'lilac', 'cream']
-  const LOCATION = 'Campus ESIS, Lubumbashi'
+  const LOCATION = 'Lubumbashi, RDC'
   let imageUrl = ''
   let postCount = 0
 
